@@ -1,0 +1,26 @@
+Developer Metrics Report
+==================================================
+
+<% if metadata[:repository] %>
+Repository: <%= metadata[:repository] %>
+<% end %>
+<% if metadata[:time_period] %>
+Time Period: <%= metadata[:time_period] %>
+<% end %>
+<% if metadata[:generated_at] %>
+Generated: <%= metadata[:generated_at] %>
+<% end %>
+
+<% grouped_results = group_results_by_category(results) %>
+<% grouped_results.each do |category, category_results| %>
+<%= category.upcase.gsub('_', ' ') %>
+------------------------------
+<% category_results.each do |result| %>
+<% if result.success? %>
+  <%= result.metric_name %>: <%= format_value(result.value) %>
+<% else %>
+  <%= result.metric_name %>: ERROR - <%= result.error %>
+<% end %>
+<% end %>
+
+<% end %>

@@ -146,7 +146,7 @@ module DevMetrics
         end
 
         # Validate output format
-        valid_formats = %w[text json csv html]
+        valid_formats = %w[text json csv html markdown]
         return if valid_formats.include?(options[:format])
 
         puts "Error: Invalid format '#{options[:format]}'. Valid formats: #{valid_formats.join(', ')}"
@@ -297,7 +297,7 @@ module DevMetrics
             --metrics=CATS     Comma-separated metric categories (default: all)
                               Available: git,all or specific metric names
             --categories=CATS  Git metric categories: commit_activity,code_churn,reliability,flow
-            --format=FORMAT    Output format: text,json,csv,html (default: text)
+            --format=FORMAT    Output format: text,json,csv,html,markdown (default: text)
             --output=FILE      Output file path (default: stdout)
             --since=DATE       Start date (YYYY-MM-DD or relative like 30d)
             --until=DATE       End date (YYYY-MM-DD)

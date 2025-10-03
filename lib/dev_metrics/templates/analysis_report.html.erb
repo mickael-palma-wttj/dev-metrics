@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Git Metrics Analysis Report</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 40px; 
+            background-color: #f8f9fa; 
+            color: #333;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 40px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        h1 { 
+            color: #2c3e50; 
+            border-bottom: 3px solid #3498db; 
+            padding-bottom: 15px; 
+            margin-bottom: 30px; 
+        }
+        h2 { 
+            color: #34495e; 
+            margin-top: 40px; 
+            margin-bottom: 20px; 
+            border-left: 4px solid #3498db; 
+            padding-left: 15px; 
+        }
+        .summary { 
+            background: #ecf0f1; 
+            padding: 20px; 
+            border-radius: 6px; 
+            margin-bottom: 30px; 
+        }
+        .summary-item { 
+            margin: 8px 0; 
+            font-weight: 500; 
+        }
+        .metric { 
+            margin: 20px 0; 
+            padding: 20px; 
+            background: #ffffff; 
+            border: 1px solid #e0e0e0; 
+            border-radius: 6px; 
+            border-left: 4px solid #27ae60; 
+        }
+        .metric-name { 
+            font-weight: bold; 
+            font-size: 1.1em; 
+            color: #2c3e50; 
+            margin-bottom: 10px; 
+        }
+        .metric-details { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 15px; 
+            margin-top: 10px; 
+        }
+        .metric-detail { 
+            background: #f8f9fa; 
+            padding: 10px; 
+            border-radius: 4px; 
+        }
+        .metric-detail strong { 
+            color: #2c3e50; 
+        }
+        .success { 
+            color: #27ae60; 
+            font-weight: bold; 
+        }
+        .contributor-filter {
+            background: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .metric-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .metric-section h4 {
+            color: #34495e;
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            font-weight: 600;
+        }
+        .nested-data {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        .data-table th,
+        .data-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .percentage {
+            color: #27ae60;
+            font-weight: 500;
+        }
+        .count {
+            color: #3498db;
+            font-weight: 500;
+        }
+        .risk-high {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        h5 {
+            color: #2c3e50;
+            margin: 15px 0 8px 0;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Git Metrics Analysis Report</h1>
+        
+        <div class="summary">
+            <% if summary[:repository_info] %>
+            <div class="summary-item"><strong>Repository:</strong> <%= summary[:repository_info][:name] %></div>
+            <div class="summary-item"><strong>Path:</strong> <%= summary[:repository_info][:path] %></div>
+            <div class="summary-item"><strong>Analyzed:</strong> <%= summary[:repository_info][:analyzed_at] %></div>
+            <% end %>
+            <% if summary[:contributor_filter] %>
+            <div class="contributor-filter">
+                <strong>Filtered by Contributors:</strong> <%= summary[:contributor_filter][:contributors].join(', ') %> 
+                (<%= summary[:contributor_filter][:count] %> contributor<%= 's' if summary[:contributor_filter][:count] != 1 %>)
+            </div>
+            <% end %>
+            <div class="summary-item"><strong>Total Metrics:</strong> <%= summary[:total_metrics] || 0 %></div>
+            <div class="summary-item"><strong>Execution Time:</strong> <%= format_execution_time(summary[:execution_time]) %></div>
+            <div class="summary-item"><strong>Data Coverage:</strong> <%= summary[:data_coverage] || 0 %>%</div>
+        </div>
+
+        <% categories = group_analysis_results(results) %>
+        <% categories.each do |category, metrics| %>
+        <h2><%= category.to_s.upcase.gsub('_', ' ') %></h2>
+        
+        <% metrics.each do |metric_name, data| %>
+        <% metric_result = data[:metric] %>
+        <div class="metric">
+            <div class="metric-name"><%= metric_name.to_s.gsub('_', ' ').titleize %></div>
+            
+            <!-- Basic Info -->
+            <div class="metric-details">
+                <div class="metric-detail">
+                    <strong>Status:</strong> <span class="success">✅ Success</span>
+                </div>
+                <div class="metric-detail">
+                    <strong>Category:</strong> <%= data[:category].to_s.titleize %>
+                </div>
+                <div class="metric-detail">
+                    <strong>Data Points:</strong> <%= metric_result.metadata[:data_points] || 0 %> <%= metric_result.metadata[:data_points_label] || 'records' %>
+                </div>
+                <div class="metric-detail">
+                    <strong>Execution Time:</strong> <%= format_execution_time(data[:execution_time]) %>ms
+                </div>
+            </div>
+
+            <!-- Time Period -->
+            <% if metric_result.time_period %>
+            <% time_period_hash = metric_result.time_period.respond_to?(:to_h) ? metric_result.time_period.to_h : metric_result.time_period %>
+            <div class="metric-section">
+                <h4>Time Period</h4>
+                <div class="metric-details">
+                    <div class="metric-detail">
+                        <strong>Duration:</strong> <%= time_period_hash[:duration_days] %> days
+                    </div>
+                    <div class="metric-detail">
+                        <strong>From:</strong> <%= time_period_hash[:start_date].to_s %>
+                    </div>
+                    <div class="metric-detail">
+                        <strong>To:</strong> <%= time_period_hash[:end_date].to_s %>
+                    </div>
+                </div>
+            </div>
+            <% end %>
+
+            <!-- Detailed Metric Value -->
+            <div class="metric-section">
+                <h4>Metric Details</h4>
+                <%= render_metric_details(metric_name, metric_result.value) %>
+            </div>
+
+            <!-- Metadata -->
+            <% if metric_result.metadata && !metric_result.metadata.empty? %>
+            <div class="metric-section">
+                <h4>Additional Information</h4>
+                <%= render_metadata_details(metric_result.metadata) %>
+            </div>
+            <% end %>
+        </div>
+        <% end %>
+        <% end %>
+    </div>
+</body>
+</html>

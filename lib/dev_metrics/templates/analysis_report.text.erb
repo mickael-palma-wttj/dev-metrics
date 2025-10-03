@@ -1,0 +1,31 @@
+Git Metrics Analysis Report
+==================================================
+
+<% if summary[:repository_info] %>
+Repository: <%= summary[:repository_info][:name] %>
+Path: <%= summary[:repository_info][:path] %>
+Analyzed: <%= summary[:repository_info][:analyzed_at] %>
+
+<% end %>
+<% if summary[:contributor_filter] %>
+Filtered by Contributors: <%= summary[:contributor_filter][:contributors].join(', ') %> (<%= summary[:contributor_filter][:count] %> contributor<%= 's' if summary[:contributor_filter][:count] != 1 %>)
+
+<% end %>
+Total Metrics: <%= summary[:total_metrics] || 0 %>
+Execution Time: <%= format_execution_time(summary[:execution_time]) %>
+Data Coverage: <%= summary[:data_coverage] || 0 %>%
+
+<% categories = group_analysis_results(results) %>
+<% categories.each do |category, metrics| %>
+<%= category.to_s.upcase.gsub('_', ' ') %>
+----------------------------------------
+<% metrics.each do |metric_name, data| %>
+<% metric_result = data[:metric] %>
+  <%= metric_name %>:
+    Status: ✅ Success
+    Data Points: <%= metric_result.metadata[:data_points] || 0 %> <%= metric_result.metadata[:data_points_label] || 'records' %>
+    Value: <%= format_metric_value(metric_result.value) %>
+
+<% end %>
+
+<% end %>
