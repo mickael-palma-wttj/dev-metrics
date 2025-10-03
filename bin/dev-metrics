@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/dev_metrics/cli/runner'
+
+begin
+  DevMetrics::CLI::Runner.new(ARGV).run
+rescue Interrupt
+  puts "\nInterrupted by user"
+  exit 1
+rescue => e
+  puts "Error: #{e.message}"
+  exit 1
+end
