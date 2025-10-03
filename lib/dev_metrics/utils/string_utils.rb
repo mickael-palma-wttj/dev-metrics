@@ -1,5 +1,5 @@
 module DevMetrics
-  module CLI
+  module Utils
     # Utility module for string operations - replaces global String monkey patching
     module StringUtils
       def self.humanize(string)

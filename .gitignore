@@ -53,3 +53,10 @@ config/local.yml
 # Temporary files
 /cache/
 /tmp/
+
+# Generated reports and output files
+/report/
+
+# Backup files
+*.bak
+*.backup

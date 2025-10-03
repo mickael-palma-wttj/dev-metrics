@@ -52,7 +52,7 @@ module DevMetrics
                             commit[:date].to_s.split(' ').first,
                             commit[:author_name],
                             "<span class=\"count\">#{commit[:calculated_size]} lines</span>",
-                            StringUtils.truncate(commit[:subject], 50)
+                            DevMetrics::Utils::StringUtils.truncate(commit[:subject], 50)
                           ])
               end.join
             end

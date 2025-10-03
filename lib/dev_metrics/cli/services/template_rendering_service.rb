@@ -26,7 +26,7 @@ module DevMetrics
         def create_binding_context(data)
           template_binding = @formatter_instance.send(:binding)
           data.each { |key, value| template_binding.local_variable_set(key, value) }
-          template_binding.local_variable_set(:string_utils, StringUtils)
+          template_binding.local_variable_set(:string_utils, DevMetrics::Utils::StringUtils)
           template_binding
         end
       end

@@ -21,7 +21,7 @@ module DevMetrics
           metric_details do
             @value.map do |key, val|
               metric_detail(
-                StringUtils.humanize(key.to_s),
+                DevMetrics::Utils::StringUtils.humanize(key.to_s),
                 ValueFormatter.format_generic_value(val)
               )
             end.join

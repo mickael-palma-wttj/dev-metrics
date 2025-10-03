@@ -76,7 +76,7 @@ module DevMetrics
           end
 
           output << "Total Metrics: #{summary[:total_metrics] || 0}"
-          output << "Execution Time: #{StringUtils.format_execution_time(summary[:execution_time])}"
+          output << "Execution Time: #{DevMetrics::Utils::StringUtils.format_execution_time(summary[:execution_time])}"
           output << "Data Coverage: #{summary[:data_coverage] || 0}%"
           output << ''
           output

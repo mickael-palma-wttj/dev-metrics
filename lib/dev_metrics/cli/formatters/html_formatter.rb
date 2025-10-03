@@ -35,7 +35,7 @@ module DevMetrics
             next if skip_keys.include?(key)
 
             html << '<div class="metric-detail">'
-            html << "<strong>#{StringUtils.humanize(key.to_s)}:</strong> "
+            html << "<strong>#{DevMetrics::Utils::StringUtils.humanize(key.to_s)}:</strong> "
             html << ValueFormatter.format_metadata_value(value)
             html << '</div>'
           end
@@ -53,15 +53,15 @@ module DevMetrics
         end
 
         def format_execution_time(time_seconds)
-          StringUtils.format_execution_time(time_seconds)
+          DevMetrics::Utils::StringUtils.format_execution_time(time_seconds)
         end
 
         def humanize_string(str)
-          StringUtils.humanize(str)
+          DevMetrics::Utils::StringUtils.humanize(str)
         end
 
         def truncate_text(text, length)
-          StringUtils.truncate(text, length)
+          DevMetrics::Utils::StringUtils.truncate(text, length)
         end
 
         def group_analysis_results(results)

@@ -1,4 +1,5 @@
 require 'time'
+require 'fileutils'
 
 module DevMetrics
   module CLI
@@ -49,7 +50,7 @@ module DevMetrics
           metrics: extract_metrics,
           categories: extract_categories,
           format: extract_option('--format', 'text'),
-          output: extract_option('--output'),
+          output: extract_output_path,
           since: extract_option('--since'),
           until: extract_option('--until'),
           contributors: extract_contributors,
@@ -92,6 +93,28 @@ module DevMetrics
         categories_value.split(',').map(&:strip).map(&:to_sym)
       end
 
+      def extract_output_path
+        custom_output = extract_option('--output')
+        return custom_output if custom_output
+
+        # Default to ./report folder with auto-generated filename
+        format = extract_option('--format', 'text')
+        timestamp = Time.now.strftime('%Y%m%d_%H%M%S')
+        repository_name = File.basename(extract_path)
+
+        "./report/#{repository_name}_metrics_#{timestamp}.#{format_extension(format)}"
+      end
+
+      def format_extension(format)
+        case format
+        when 'json' then 'json'
+        when 'csv' then 'csv'
+        when 'html' then 'html'
+        when 'markdown' then 'md'
+        else 'txt'
+        end
+      end
+
       def extract_git_categories
         # Map CLI category names to Git metric categories
         return options[:categories] if options[:categories]
@@ -105,6 +128,10 @@ module DevMetrics
 
       def write_output(content)
         if options[:output]
+          # Ensure the directory exists
+          output_dir = File.dirname(options[:output])
+          FileUtils.mkdir_p(output_dir) unless File.directory?(output_dir)
+
           File.write(options[:output], content)
           puts "Results written to: #{options[:output]}"
         else
@@ -298,7 +325,7 @@ module DevMetrics
                               Available: git,all or specific metric names
             --categories=CATS  Git metric categories: commit_activity,code_churn,reliability,flow
             --format=FORMAT    Output format: text,json,csv,html,markdown (default: text)
-            --output=FILE      Output file path (default: stdout)
+            --output=FILE      Output file path (default: ./report/[auto-generated])
             --since=DATE       Start date (YYYY-MM-DD or relative like 30d)
             --until=DATE       End date (YYYY-MM-DD)
             --all-time         Analyze since the first commit in the repository
