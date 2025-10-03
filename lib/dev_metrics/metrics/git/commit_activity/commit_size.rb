@@ -21,9 +21,9 @@ module DevMetrics
 
           def compute_metric(commits_data)
             return {} if commits_data.empty?
-            
+
             sizes = commits_data.map { |commit| commit[:additions] + commit[:deletions] }
-            
+
             {
               total_commits: commits_data.size,
               average_size: (sizes.sum.to_f / sizes.size).round(2),
@@ -40,11 +40,11 @@ module DevMetrics
 
           def build_metadata(commits_data)
             return super if commits_data.empty?
-            
+
             total_changes = commits_data.sum { |c| c[:additions] + c[:deletions] }
             total_additions = commits_data.sum { |c| c[:additions] }
             total_deletions = commits_data.sum { |c| c[:deletions] }
-            
+
             super.merge(
               total_lines_changed: total_changes,
               total_additions: total_additions,
@@ -59,7 +59,7 @@ module DevMetrics
           def calculate_median(sizes)
             sorted = sizes.sort
             mid = sorted.length / 2
-            
+
             if sorted.length.odd?
               sorted[mid]
             else
@@ -69,7 +69,7 @@ module DevMetrics
 
           def calculate_distribution_percentages(sizes)
             return {} if sizes.empty?
-            
+
             total = sizes.size
             {
               small_percent: ((sizes.count { |s| s <= 10 }.to_f / total) * 100).round(1),

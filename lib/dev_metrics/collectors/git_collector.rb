@@ -1,3 +1,5 @@
+require 'time'
+
 module DevMetrics
   module Collectors
     # Collects data from Git repositories using git log and related commands
@@ -11,24 +13,24 @@ module DevMetrics
 
       def collect_commits(time_period = nil)
         setup_collection(time_period)
-        
+
         format = '%H|%an|%ae|%ad|%s'
-        
+
         commits_output = git_command.git_log(
           format: format,
           since: time_period&.git_since_format,
           until_date: time_period&.git_until_format,
           all: true
         )
-        
+
         parse_commits(commits_output)
       end
 
       def collect_commit_stats(time_period = nil)
         setup_collection(time_period)
-        
+
         format = '%H|%an|%ae|%ad|%s'
-        
+
         stats_output = git_command.git_log(
           format: format,
           since: time_period&.git_since_format,
@@ -36,13 +38,13 @@ module DevMetrics
           numstat: true,
           all: true
         )
-        
+
         parse_commit_stats(stats_output)
       end
 
       def collect_file_changes(time_period = nil)
         setup_collection(time_period)
-        
+
         changes_output = git_command.git_log(
           format: '%H',
           since: time_period&.git_since_format,
@@ -50,38 +52,64 @@ module DevMetrics
           name_only: true,
           all: true
         )
-        
+
         parse_file_changes(changes_output)
       end
 
       def collect_contributors(time_period = nil)
         setup_collection(time_period)
-        
+
         shortlog_output = git_command.shortlog(
           summary: true,
           numbered: true,
           all: true,
           since: time_period&.git_since_format,
-          until_date: time_period&.git_until_date
+          until_date: time_period&.git_until_format
         )
-        
+
         parse_contributors(shortlog_output)
       end
 
       def collect_tags
-        git_command.tag_list(sort_by_date: true, list: true)
+        tags_output = git_command.execute("tag -l --sort=-creatordate --format='%(refname:short)|%(creatordate)'",
+                                          allow_pager: true)
+        parse_tags(tags_output)
       end
 
       def collect_branches
         git_command.branch_list(all: true)
       end
 
+      def parse_tags(output)
+        return [] if output.empty?
+
+        tags = []
+        output.split("\n").each do |line|
+          next if line.strip.empty?
+
+          parts = line.split('|', 2)
+          next if parts.length < 2
+
+          tags << {
+            name: parts[0],
+            tag_name: parts[0], # alias for compatibility
+            date: Time.parse(parts[1]),
+            repository: repository.name
+          }
+        end
+
+        tags
+      rescue StandardError => e
+        log_error("Failed to parse tags: #{e.message}")
+        []
+      end
+
       protected
 
       def validate_repository
-        unless repository.valid?
-          raise CollectionError, "Invalid Git repository: #{repository.path}"
-        end
+        return if repository.valid?
+
+        raise CollectionError, "Invalid Git repository: #{repository.path}"
       end
 
       def perform_collection
@@ -93,40 +121,40 @@ module DevMetrics
 
       def parse_commits(output)
         return [] if output.empty?
-        
+
         commits = []
         output.split("\n").each do |line|
           next if line.strip.empty?
-          
+
           parts = line.split('|', 5)
           next if parts.length < 5
-          
+
           commits << {
             hash: parts[0],
             author_name: parts[1],
             author_email: parts[2],
             date: Time.parse(parts[3]),
-            subject: parts[4],
+            message: parts[4],
             repository: repository.name
           }
         end
-        
+
         commits
-      rescue => e
+      rescue StandardError => e
         log_error("Failed to parse commits: #{e.message}")
         []
       end
 
       def parse_commit_stats(output)
         return [] if output.empty?
-        
+
         commits = []
         current_commit = nil
-        
+
         output.split("\n").each do |line|
           line = line.strip
           next if line.empty?
-          
+
           if line.include?('|') && line.count('|') >= 4
             # This is a commit header line
             parts = line.split('|', 5)
@@ -148,34 +176,34 @@ module DevMetrics
             additions = match[1] == '-' ? 0 : match[1].to_i
             deletions = match[2] == '-' ? 0 : match[2].to_i
             filename = match[3]
-            
+
             current_commit[:files_changed] << {
               filename: filename,
               additions: additions,
               deletions: deletions
             }
-            
+
             current_commit[:additions] += additions
             current_commit[:deletions] += deletions
           end
         end
-        
+
         commits
-      rescue => e
+      rescue StandardError => e
         log_error("Failed to parse commit stats: #{e.message}")
         []
       end
 
       def parse_file_changes(output)
         return {} if output.empty?
-        
+
         file_commits = {}
         current_commit = nil
-        
+
         output.split("\n").each do |line|
           line = line.strip
           next if line.empty?
-          
+
           if line.length == 40 && line.match(/^[a-f0-9]+$/)
             # This is a commit hash
             current_commit = line
@@ -185,26 +213,26 @@ module DevMetrics
             file_commits[line] << current_commit
           end
         end
-        
+
         file_commits
-      rescue => e
+      rescue StandardError => e
         log_error("Failed to parse file changes: #{e.message}")
         {}
       end
 
       def parse_contributors(output)
         return [] if output.empty?
-        
+
         contributors = []
         output.split("\n").each do |line|
           next if line.strip.empty?
-          
+
           match = line.match(/^\s*(\d+)\s+(.+)$/)
           next unless match
-          
+
           commit_count = match[1].to_i
           contributor_info = match[2]
-          
+
           # Parse "Name <email>" format
           if contributor_info.match(/^(.+)\s+<(.+)>$/)
             name_match = contributor_info.match(/^(.+)\s+<(.+)>$/)
@@ -214,7 +242,7 @@ module DevMetrics
             name = contributor_info.strip
             email = nil
           end
-          
+
           contributors << {
             name: name,
             email: email,
@@ -222,9 +250,9 @@ module DevMetrics
             repository: repository.name
           }
         end
-        
+
         contributors
-      rescue => e
+      rescue StandardError => e
         log_error("Failed to parse contributors: #{e.message}")
         []
       end

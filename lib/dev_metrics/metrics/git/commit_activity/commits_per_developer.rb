@@ -21,17 +21,19 @@ module DevMetrics
 
           def compute_metric(contributors_data)
             return {} if contributors_data.empty?
-            
+
             contributors_by_commits = contributors_data.sort_by { |c| -c[:commit_count] }
-            
+
             result = {}
             contributors_by_commits.each do |contributor|
-              key = contributor[:email] ? 
-                    "#{contributor[:name]} <#{contributor[:email]}>" : 
-                    contributor[:name]
+              key = if contributor[:email]
+                      "#{contributor[:name]} <#{contributor[:email]}>"
+                    else
+                      contributor[:name]
+                    end
               result[key] = contributor[:commit_count]
             end
-            
+
             result
           end
 
@@ -39,8 +41,13 @@ module DevMetrics
             super.merge(
               total_contributors: contributors_data.size,
               total_commits: contributors_data.sum { |c| c[:commit_count] },
-              avg_commits_per_contributor: contributors_data.empty? ? 0 : 
-                (contributors_data.sum { |c| c[:commit_count] }.to_f / contributors_data.size).round(2),
+              avg_commits_per_contributor: if contributors_data.empty?
+                                             0
+                                           else
+                                             (contributors_data.sum do |c|
+                                               c[:commit_count]
+                                             end.to_f / contributors_data.size).round(2)
+                                           end,
               top_contributor: contributors_data.max_by { |c| c[:commit_count] }&.dig(:name)
             )
           end

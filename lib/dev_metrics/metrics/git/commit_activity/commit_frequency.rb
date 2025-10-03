@@ -23,7 +23,7 @@ module DevMetrics
 
           def compute_metric(commits_data)
             return {} if commits_data.empty?
-            
+
             {
               total_commits: commits_data.size,
               commits_per_day: calculate_commits_per_day(commits_data),
@@ -38,10 +38,10 @@ module DevMetrics
 
           def build_metadata(commits_data)
             return super if commits_data.empty?
-            
+
             dates = commits_data.map { |c| c[:date] }
             date_range = dates.max - dates.min
-            
+
             super.merge(
               time_span_days: (date_range / (24 * 60 * 60)).round(1),
               first_commit: dates.min,
@@ -54,8 +54,8 @@ module DevMetrics
 
           def calculate_commits_per_day(commits_data)
             daily_counts = commits_data.group_by { |c| c[:date].strftime('%Y-%m-%d') }
-                                     .transform_values(&:count)
-            
+                                       .transform_values(&:count)
+
             {
               by_date: daily_counts,
               average: (daily_counts.values.sum.to_f / daily_counts.size).round(2),
@@ -66,34 +66,34 @@ module DevMetrics
 
           def calculate_commits_per_hour(commits_data)
             hourly_counts = Hash.new(0)
-            
+
             commits_data.each do |commit|
               hour = commit[:date].hour
               hourly_counts[hour] += 1
             end
-            
+
             # Fill in missing hours with 0
             (0..23).each { |hour| hourly_counts[hour] ||= 0 }
-            
+
             hourly_counts
           end
 
           def calculate_commits_per_weekday(commits_data)
             weekday_names = %w[Sunday Monday Tuesday Wednesday Thursday Friday Saturday]
             weekday_counts = Hash.new(0)
-            
+
             commits_data.each do |commit|
               weekday = weekday_names[commit[:date].wday]
               weekday_counts[weekday] += 1
             end
-            
+
             weekday_counts
           end
 
           def calculate_working_hours_split(commits_data)
             working_hours_count = commits_data.count { |c| working_hours?(c[:date]) }
             off_hours_count = commits_data.size - working_hours_count
-            
+
             {
               working_hours: working_hours_count,
               off_hours: off_hours_count,
@@ -104,11 +104,11 @@ module DevMetrics
 
           def find_busiest_day(commits_data)
             daily_counts = commits_data.group_by { |c| c[:date].strftime('%Y-%m-%d') }
-                                     .transform_values(&:count)
-            
+                                       .transform_values(&:count)
+
             busiest_date = daily_counts.max_by { |_, count| count }
             return nil unless busiest_date
-            
+
             {
               date: busiest_date[0],
               commits: busiest_date[1]
@@ -116,32 +116,35 @@ module DevMetrics
           end
 
           def find_busiest_hour(commits_data)
+            return 'Unknown' if commits_data.empty?
+
             hourly_counts = calculate_commits_per_hour(commits_data)
-            busiest_hour = hourly_counts.max_by { |_, count| count }
-            
-            {
-              hour: busiest_hour[0],
-              commits: busiest_hour[1]
-            }
+            busiest_hour = hourly_counts.max_by { |_, count| count }.first
+
+            "#{busiest_hour}:00"
+          end
+
+          def data_points_description
+            'commits'
           end
 
           def calculate_consistency_score(commits_data)
             return 0 if commits_data.empty?
-            
+
             daily_counts = commits_data.group_by { |c| c[:date].strftime('%Y-%m-%d') }
-                                     .transform_values(&:count)
-            
+                                       .transform_values(&:count)
+
             return 100 if daily_counts.size <= 1
-            
+
             values = daily_counts.values
             mean = values.sum.to_f / values.size
-            variance = values.map { |v| (v - mean) ** 2 }.sum / values.size
+            variance = values.map { |v| (v - mean)**2 }.sum / values.size
             std_dev = Math.sqrt(variance)
-            
+
             # Convert to 0-100 scale where lower standard deviation = higher consistency
             coefficient_of_variation = std_dev / mean
             consistency = [100 - (coefficient_of_variation * 50), 0].max
-            
+
             consistency.round(1)
           end
         end

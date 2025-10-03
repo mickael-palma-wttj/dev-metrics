@@ -1,3 +1,5 @@
+require 'time'
+
 module DevMetrics
   module CLI
     # Main CLI runner that handles command parsing and orchestrates the application
@@ -45,6 +47,7 @@ module DevMetrics
         options = {
           path: extract_path,
           metrics: extract_metrics,
+          categories: extract_categories,
           format: extract_option('--format', 'text'),
           output: extract_option('--output'),
           since: extract_option('--since'),
@@ -53,7 +56,9 @@ module DevMetrics
           interactive: has_flag?('--interactive'),
           recursive: has_flag?('--recursive'),
           exclude_bots: has_flag?('--exclude-bots'),
-          no_progress: has_flag?('--no-progress')
+          include_merge_commits: !has_flag?('--exclude-merges'),
+          no_progress: has_flag?('--no-progress'),
+          all_time: has_flag?('--all-time')
         }
 
         validate_options(options)
@@ -78,6 +83,33 @@ module DevMetrics
         return [] unless contributors_value
 
         contributors_value.split(',').map(&:strip)
+      end
+
+      def extract_categories
+        categories_value = extract_option('--categories')
+        return nil unless categories_value
+
+        categories_value.split(',').map(&:strip).map(&:to_sym)
+      end
+
+      def extract_git_categories
+        # Map CLI category names to Git metric categories
+        return options[:categories] if options[:categories]
+
+        case options[:metrics]
+        when 'git' then %i[commit_activity code_churn reliability flow]
+        when 'all' then nil # All categories
+        else nil
+        end
+      end
+
+      def write_output(content)
+        if options[:output]
+          File.write(options[:output], content)
+          puts "Results written to: #{options[:output]}"
+        else
+          puts content
+        end
       end
 
       def extract_option(flag, default = nil)
@@ -126,19 +158,38 @@ module DevMetrics
 
         begin
           repository = DevMetrics::Models::Repository.new(options[:path])
-          time_period = build_time_period
+
+          # Validate repository has Git data
+          unless repository.git_repository?
+            puts "Error: Not a Git repository: #{options[:path]}"
+            exit 1
+          end
 
           puts "Repository: #{repository.name}"
-          puts "Time period: #{time_period}"
+          puts "Time period: #{build_time_period}"
           puts "Metrics: #{options[:metrics]}"
           puts "Format: #{options[:format]}"
+          puts ''
 
-          # For now, just show what would be analyzed
-          # In Phase 2, we'll implement actual metric collection
-          puts "\n[Phase 1 Complete] Analysis structure ready!"
-          puts 'Next: Implement Git metrics collection in Phase 2'
+          # Run Git metrics analysis
+          analyzer = DevMetrics::Analyzers::GitAnalyzer.new(repository, options)
+
+          categories = extract_git_categories
+          results = analyzer.analyze(options[:metrics], categories)
+
+          # Format and output results
+          formatter = DevMetrics::CLI::OutputFormatter.new(options[:format])
+          output = formatter.format_analysis_results(results, analyzer.summary)
+
+          write_output(output)
+
+          puts "\n✅ Analysis complete! Analyzed #{results.size} metrics"
         rescue ArgumentError => e
           puts "Error: #{e.message}"
+          exit 1
+        rescue StandardError => e
+          puts "Unexpected error: #{e.message}"
+          puts 'Please check your repository and try again.'
           exit 1
         end
       end
@@ -175,13 +226,57 @@ module DevMetrics
       end
 
       def build_time_period
-        if options[:since] || options[:until]
-          start_date = options[:since] ? Time.parse(options[:since]) : 30
-          end_date = options[:until] ? Time.parse(options[:until]) : Time.now
+        if options[:all_time]
+          # Create repository to get first commit date
+          repository = DevMetrics::Models::Repository.new(options[:path])
+          first_commit_date = get_first_commit_date(repository)
+          DevMetrics::Models::TimePeriod.new(first_commit_date, Time.now)
+        elsif options[:since] || options[:until]
+          start_date = parse_time_option(options[:since]) || 30
+          end_date = parse_time_option(options[:until]) || Time.now
           DevMetrics::Models::TimePeriod.new(start_date, end_date)
         else
           DevMetrics::Models::TimePeriod.default
         end
+      end
+
+      def parse_time_option(time_option)
+        return nil unless time_option
+
+        if time_option.is_a?(String) && time_option.match?(/^\d+[dwmy]$/)
+          # Relative time format (30d, 2w, 1m, 1y)
+          number = time_option.to_i
+          unit = time_option[-1]
+
+          case unit
+          when 'd' then Time.now - (number * 24 * 60 * 60)
+          when 'w' then Time.now - (number * 7 * 24 * 60 * 60)
+          when 'm' then Time.now - (number * 30 * 24 * 60 * 60)
+          when 'y' then Time.now - (number * 365 * 24 * 60 * 60)
+          end
+        else
+          Time.parse(time_option.to_s)
+        end
+      rescue ArgumentError
+        raise ArgumentError, "Invalid time format: #{time_option}"
+      end
+
+      def get_first_commit_date(repository)
+        # Use GitCommand to get the first commit date
+        git_command = DevMetrics::Utils::GitCommand.new(repository.path)
+
+        # Get the oldest commit directly using log with reverse order
+        # Use --all to include all branches and limit to first result
+        first_commit_output = git_command.execute('log --all --reverse --format=%ad --date=iso', allow_pager: true)
+
+        return Time.now - (365 * 24 * 60 * 60) if first_commit_output.empty? # Fallback to 1 year ago
+
+        # Get the first line (oldest commit)
+        first_line = first_commit_output.strip.split("\n").first
+        Time.parse(first_line)
+      rescue StandardError => e
+        puts "Warning: Could not determine first commit date (#{e.message}). Using 1 year ago as fallback."
+        Time.now - (365 * 24 * 60 * 60) # Fallback to 1 year ago
       end
 
       def show_help
@@ -200,20 +295,24 @@ module DevMetrics
 
           OPTIONS:
             --metrics=CATS     Comma-separated metric categories (default: all)
-                              Available: git,pr_throughput,team_health,all
+                              Available: git,all or specific metric names
+            --categories=CATS  Git metric categories: commit_activity,code_churn,reliability,flow
             --format=FORMAT    Output format: text,json,csv,html (default: text)
             --output=FILE      Output file path (default: stdout)
             --since=DATE       Start date (YYYY-MM-DD or relative like 30d)
             --until=DATE       End date (YYYY-MM-DD)
+            --all-time         Analyze since the first commit in the repository
             --contributors=X   Focus on specific contributors (comma-separated)
             --interactive      Interactive repository selection
             --recursive        Scan subdirectories for repositories
             --exclude-bots     Exclude bot accounts from analysis
+            --exclude-merges   Exclude merge commits from analysis
             --no-progress      Disable progress indicators
 
           EXAMPLES:
             dev-metrics analyze .
             dev-metrics analyze /path/to/repo --format=json --output=metrics.json
+            dev-metrics analyze . --all-time --format=text
             dev-metrics scan /workspace --interactive --metrics=git,pr_throughput
             dev-metrics analyze . --since=2024-01-01 --contributors=john.doe
 

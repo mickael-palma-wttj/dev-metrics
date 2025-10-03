@@ -1,6 +1,7 @@
 module DevMetrics
-  # Utility module for time-related operations and working hours calculations
-  module TimeHelper
+  module Utils
+    # Utility module for time-related operations and working hours calculations
+    module TimeHelper
     WORKING_HOURS_START = 9
     WORKING_HOURS_END = 18
     WEEKEND_DAYS = [0, 6] # Sunday and Saturday
@@ -112,6 +113,7 @@ module DevMetrics
       else
         raise ArgumentError, "Cannot parse timestamp: #{timestamp}"
       end
+    end
     end
   end
 end

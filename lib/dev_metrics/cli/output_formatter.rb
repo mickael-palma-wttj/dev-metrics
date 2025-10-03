@@ -30,6 +30,21 @@ module DevMetrics
         end
       end
 
+      def format_analysis_results(results, summary = {})
+        case format
+        when 'text'
+          format_analysis_text(results, summary)
+        when 'json'
+          format_analysis_json(results, summary)
+        when 'csv'
+          format_analysis_csv(results, summary)
+        when 'html'
+          format_analysis_html(results, summary)
+        else
+          raise ArgumentError, "Unsupported format: #{format}"
+        end
+      end
+
       def output(content)
         if output_file
           File.write(output_file, content)
@@ -200,6 +215,110 @@ module DevMetrics
         end
       end
 
+      def format_analysis_text(results, summary)
+        output = []
+
+        # Header
+        output << 'Git Metrics Analysis Report'
+        output << '=' * 50
+        output << ''
+
+        # Summary
+        if summary[:repository_info]
+          repo_info = summary[:repository_info]
+          output << "Repository: #{repo_info[:name]}"
+          output << "Path: #{repo_info[:path]}"
+          output << "Analyzed: #{repo_info[:analyzed_at]}"
+          output << ''
+        end
+
+        output << "Total Metrics: #{summary[:total_metrics] || 0}"
+        output << "Execution Time: #{format_execution_time(summary[:execution_time])}"
+        output << "Data Coverage: #{summary[:data_coverage] || 0}%"
+        output << ''
+
+        # Results by category
+        categories = group_analysis_results(results)
+
+        categories.each do |category, metrics|
+          output << category.to_s.upcase.gsub('_', ' ')
+          output << '-' * 40
+
+          metrics.each do |metric_name, data|
+            metric_result = data[:metric]
+            output << "  #{metric_name}:"
+            output << '    Status: ✅ Success'
+            data_points_count = metric_result.metadata[:data_points] || 0
+            data_points_label = metric_result.metadata[:data_points_label] || 'records'
+            output << "    Data Points: #{data_points_count} #{data_points_label}"
+            output << "    Value: #{format_metric_value(metric_result.value)}"
+            output << ''
+          end
+
+          output << ''
+        end
+
+        output.join("\n")
+      end
+
+      def format_analysis_json(results, summary)
+        {
+          summary: summary,
+          results: results.transform_values do |data|
+            {
+              category: data[:metadata][:category],
+              metric: data[:metric].to_h,
+              execution_time: data[:metadata][:execution_time]
+            }
+          end
+        }.to_json
+      end
+
+      def format_analysis_csv(results, summary)
+        require 'csv'
+
+        CSV.generate do |csv|
+          csv << %w[category metric_name value data_points execution_time]
+
+          results.each do |metric_name, data|
+            metric_result = data[:metric]
+            csv << [
+              data[:metadata][:category],
+              metric_name,
+              format_metric_value(metric_result.value),
+              metric_result.metadata[:data_points] || 0,
+              data[:metadata][:execution_time] || 0
+            ]
+          end
+        end
+      end
+
+      def format_analysis_html(results, summary)
+        # Similar to existing HTML format but adapted for analysis results
+        format_html([], summary.merge(results: results))
+      end
+
+      def group_analysis_results(results)
+        results.group_by { |_, data| data[:metadata][:category] }
+      end
+
+      def format_metric_value(value)
+        case value
+        when Numeric
+          value.round(2)
+        when Array
+          "#{value.size} items"
+        when Hash
+          if value.empty?
+            'No data'
+          else
+            "#{value.keys.size} categories"
+          end
+        else
+          value.to_s
+        end
+      end
+
       def format_value(value)
         case value
         when Numeric
@@ -207,7 +326,7 @@ module DevMetrics
         when Array
           "#{value.size} items"
         when Hash
-          "#{value.keys.size} entries"
+          "#{value.keys.size} categories"
         else
           value.to_s
         end
@@ -220,6 +339,16 @@ module DevMetrics
           failed_metrics: results.count(&:failed?),
           categories: group_results_by_category(results).keys
         }
+      end
+
+      def format_execution_time(time_seconds)
+        return '0s' if time_seconds.nil? || time_seconds == 0
+
+        if time_seconds < 1
+          "#{(time_seconds * 1000).round(0)}ms"
+        else
+          "#{time_seconds.round(2)}s"
+        end
       end
     end
   end

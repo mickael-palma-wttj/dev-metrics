@@ -18,6 +18,10 @@ module DevMetrics
         File.directory?(git_directory)
       end
 
+      def git_repository?
+        valid?
+      end
+
       def remote_origin_url
         @remote_url
       end
