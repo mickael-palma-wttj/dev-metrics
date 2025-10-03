@@ -60,3 +60,4 @@ config/local.yml
 # Backup files
 *.bak
 *.backup
+.rspec_status
