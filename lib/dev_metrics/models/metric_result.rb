@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module Models
     # Standardized container for metric calculation results
@@ -29,7 +31,7 @@ module DevMetrics
           repository: repository,
           time_period: time_period&.to_h,
           metadata: metadata,
-          error: error
+          error: error,
         }
       end
 

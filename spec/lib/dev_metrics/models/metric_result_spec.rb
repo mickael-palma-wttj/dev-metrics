@@ -1,12 +1,8 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
-RSpec.describe DevMetrics::Models::MetricResult do
-  let(:metric_name) { 'test_metric' }
-  let(:value) { 42 }
-  let(:repository) { 'test-repo' }
-  let(:time_period) { create_test_time_period }
-  let(:metadata) { { total_records: 10 } }
-
+RSpec.describe Models::MetricResult do
   subject do
     described_class.new(
       metric_name: metric_name,
@@ -16,6 +12,12 @@ RSpec.describe DevMetrics::Models::MetricResult do
       metadata: metadata
     )
   end
+
+  let(:metric_name) { 'test_metric' }
+  let(:value) { 42 }
+  let(:repository) { 'test-repo' }
+  let(:time_period) { create_test_time_period }
+  let(:metadata) { { total_records: 10 } }
 
   it_behaves_like 'a model with hash conversion'
 

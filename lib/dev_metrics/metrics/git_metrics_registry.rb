@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module Metrics
     # Registry for Git-based metrics, providing discovery and organization
@@ -10,8 +12,8 @@ module DevMetrics
             commits_per_developer: 'DevMetrics::Metrics::Git::CommitActivity::CommitsPerDeveloper',
             commit_size: 'DevMetrics::Metrics::Git::CommitActivity::CommitSize',
             commit_frequency: 'DevMetrics::Metrics::Git::CommitActivity::CommitFrequency',
-            lines_changed: 'DevMetrics::Metrics::Git::CommitActivity::LinesChanged'
-          }
+            lines_changed: 'DevMetrics::Metrics::Git::CommitActivity::LinesChanged',
+          },
         },
         code_churn: {
           name: 'Code Churn',
@@ -20,8 +22,8 @@ module DevMetrics
             file_churn: 'DevMetrics::Metrics::Git::CodeChurn::FileChurn',
             authors_per_file: 'DevMetrics::Metrics::Git::CodeChurn::AuthorsPerFile',
             file_ownership: 'DevMetrics::Metrics::Git::CodeChurn::FileOwnership',
-            co_change_pairs: 'DevMetrics::Metrics::Git::CodeChurn::CoChangePairs'
-          }
+            co_change_pairs: 'DevMetrics::Metrics::Git::CodeChurn::CoChangePairs',
+          },
         },
         reliability: {
           name: 'Reliability',
@@ -29,17 +31,17 @@ module DevMetrics
           metrics: {
             revert_rate: 'DevMetrics::Metrics::Git::Reliability::RevertRate',
             bugfix_ratio: 'DevMetrics::Metrics::Git::Reliability::BugfixRatio',
-            large_commits: 'DevMetrics::Metrics::Git::Reliability::LargeCommits'
-          }
+            large_commits: 'DevMetrics::Metrics::Git::Reliability::LargeCommits',
+          },
         },
         flow: {
           name: 'Flow',
           description: 'Development flow and deployment metrics',
           metrics: {
             lead_time: 'DevMetrics::Metrics::Git::Flow::LeadTime',
-            deployment_frequency: 'DevMetrics::Metrics::Git::Flow::DeploymentFrequency'
-          }
-        }
+            deployment_frequency: 'DevMetrics::Metrics::Git::Flow::DeploymentFrequency',
+          },
+        },
       }.freeze
 
       class << self
@@ -52,7 +54,7 @@ module DevMetrics
         end
 
         def all_metrics
-          @all_metrics ||= METRIC_CATEGORIES.flat_map do |category, info|
+          @all_metrics ||= METRIC_CATEGORIES.flat_map do |_category, info|
             info[:metrics].keys
           end
         end
@@ -65,7 +67,7 @@ module DevMetrics
         end
 
         def metric_class(metric_name)
-          METRIC_CATEGORIES.each do |_, category_info|
+          METRIC_CATEGORIES.each_value do |category_info|
             class_name = category_info[:metrics][metric_name.to_sym]
             return constantize_metric(class_name) if class_name
           end
@@ -110,7 +112,7 @@ module DevMetrics
               name: info[:name],
               description: info[:description],
               count: info[:metrics].size,
-              metrics: info[:metrics].keys
+              metrics: info[:metrics].keys,
             }
           end
           summary

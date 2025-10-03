@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module Metrics
     module Git
       module CodeChurn
         # Identifies files with high churn (frequent changes)
-        class FileChurn < DevMetrics::BaseMetric
+        class FileChurn < BaseMetric
           def metric_name
             'file_churn'
           end
@@ -47,8 +49,8 @@ module DevMetrics
                 commits: stats[:commits],
                 authors_count: stats[:authors].size,
                 authors: stats[:authors].to_a,
-                avg_churn_per_commit: stats[:commits] > 0 ? (total_churn.to_f / stats[:commits]).round(2) : 0,
-                churn_ratio: total_churn > 0 ? (stats[:deletions].to_f / total_churn * 100).round(1) : 0
+                avg_churn_per_commit: stats[:commits].positive? ? (total_churn.to_f / stats[:commits]).round(2) : 0,
+                churn_ratio: total_churn.positive? ? (stats[:deletions].to_f / total_churn * 100).round(1) : 0,
               }
             end
 
@@ -71,11 +73,11 @@ module DevMetrics
             super.merge(
               total_files_changed: all_files.size,
               total_file_changes: total_file_changes,
-              avg_changes_per_file: all_files.size > 0 ? (total_file_changes.to_f / all_files.size).round(2) : 0,
+              avg_changes_per_file: all_files.size.positive? ? (total_file_changes.to_f / all_files.size).round(2) : 0,
               high_churn_files: high_churn_files,
               medium_churn_files: medium_churn_files,
               low_churn_files: low_churn_files,
-              hotspot_percentage: all_files.size > 0 ? (high_churn_files.to_f / all_files.size * 100).round(1) : 0
+              hotspot_percentage: all_files.size.positive? ? (high_churn_files.to_f / all_files.size * 100).round(1) : 0
             )
           end
         end

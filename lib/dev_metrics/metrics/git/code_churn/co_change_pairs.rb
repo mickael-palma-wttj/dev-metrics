@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module Metrics
     module Git
       module CodeChurn
         # Identifies files that are frequently changed together
-        class CoChangePairs < DevMetrics::BaseMetric
+        class CoChangePairs < BaseMetric
           def metric_name
             'co_change_pairs'
           end
@@ -58,7 +60,7 @@ module DevMetrics
                 file2_total_changes: file2_total,
                 coupling_strength: coupling_strength,
                 coupling_percentage: (co_change_count.to_f / [file1_total, file2_total].min * 100).round(1),
-                coupling_category: categorize_coupling(coupling_strength)
+                coupling_category: categorize_coupling(coupling_strength),
               }
             end
 
@@ -89,11 +91,11 @@ module DevMetrics
           private
 
           def calculate_coupling_strength(co_changes, file1_total, file2_total)
-            return 0 if file1_total == 0 || file2_total == 0
+            return 0 if file1_total.zero? || file2_total.zero?
 
             # Jaccard similarity coefficient: intersection / union
             union = file1_total + file2_total - co_changes
-            return 0 if union == 0
+            return 0 if union.zero?
 
             (co_changes.to_f / union).round(3)
           end
@@ -115,7 +117,7 @@ module DevMetrics
             # Find files that appear in multiple high-coupling relationships
             file_coupling_counts = Hash.new(0)
 
-            result.each do |_, stats|
+            result.each_value do |stats|
               next unless stats[:coupling_strength] > 0.3
 
               file_coupling_counts[stats[:file1]] += 1

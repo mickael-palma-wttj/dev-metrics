@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module Metrics
     module Git
       module CommitActivity
         # Analyzes commit size based on lines added and deleted
-        class CommitSize < DevMetrics::BaseMetric
+        class CommitSize < BaseMetric
           def metric_name
             'commit_size'
           end
@@ -34,7 +36,7 @@ module DevMetrics
               medium_commits: sizes.count { |s| s > 10 && s <= 100 },
               large_commits: sizes.count { |s| s > 100 && s <= 500 },
               huge_commits: sizes.count { |s| s > 500 },
-              distribution_percentages: calculate_distribution_percentages(sizes)
+              distribution_percentages: calculate_distribution_percentages(sizes),
             }
           end
 
@@ -75,7 +77,7 @@ module DevMetrics
               small_percent: ((sizes.count { |s| s <= 10 }.to_f / total) * 100).round(1),
               medium_percent: ((sizes.count { |s| s > 10 && s <= 100 }.to_f / total) * 100).round(1),
               large_percent: ((sizes.count { |s| s > 100 && s <= 500 }.to_f / total) * 100).round(1),
-              huge_percent: ((sizes.count { |s| s > 500 }.to_f / total) * 100).round(1)
+              huge_percent: ((sizes.count { |s| s > 500 }.to_f / total) * 100).round(1),
             }
           end
         end

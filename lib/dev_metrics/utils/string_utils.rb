@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module Utils
     # Utility module for string operations - replaces global String monkey patching
     module StringUtils
       def self.humanize(string)
-        string.to_s.gsub(/[_-]/, ' ').split(' ').map(&:capitalize).join(' ')
+        string.to_s.gsub(/[_-]/, ' ').split.map(&:capitalize).join(' ')
       end
 
       def self.titleize(string)
@@ -17,7 +19,7 @@ module DevMetrics
       end
 
       def self.format_execution_time(time_seconds)
-        return '0s' if time_seconds.nil? || time_seconds == 0
+        return '0s' if time_seconds.nil? || time_seconds.zero?
 
         if time_seconds < 1
           "#{(time_seconds * 1000).round(0)}ms"

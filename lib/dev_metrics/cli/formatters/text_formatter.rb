@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module CLI
     module Formatters
@@ -38,7 +40,7 @@ module DevMetrics
           [
             'Developer Metrics Report',
             '=' * 50,
-            ''
+            '',
           ]
         end
 
@@ -46,7 +48,7 @@ module DevMetrics
           [
             'Git Metrics Analysis Report',
             '=' * 50,
-            ''
+            '',
           ]
         end
 
@@ -76,7 +78,7 @@ module DevMetrics
           end
 
           output << "Total Metrics: #{summary[:total_metrics] || 0}"
-          output << "Execution Time: #{DevMetrics::Utils::StringUtils.format_execution_time(summary[:execution_time])}"
+          output << "Execution Time: #{Utils::StringUtils.format_execution_time(summary[:execution_time])}"
           output << "Data Coverage: #{summary[:data_coverage] || 0}%"
           output << ''
           output
@@ -88,7 +90,7 @@ module DevMetrics
 
           grouped_results.each do |category, category_results|
             output << category.upcase.gsub('_', ' ')
-            output << '-' * 30
+            output << ('-' * 30)
 
             category_results.each do |result|
               output << format_result_line(result)
@@ -106,7 +108,7 @@ module DevMetrics
 
           categories.each do |category, metrics|
             output << category.to_s.upcase.gsub('_', ' ')
-            output << '-' * 40
+            output << ('-' * 40)
 
             metrics.each do |metric_name, data|
               output.concat(format_analysis_metric(metric_name, data))
@@ -136,7 +138,7 @@ module DevMetrics
             '    Status: ✅ Success',
             "    Data Points: #{data_points_count} #{data_points_label}",
             "    Value: #{ValueFormatter.format_metric_value(metric_result.value)}",
-            ''
+            '',
           ]
         end
 

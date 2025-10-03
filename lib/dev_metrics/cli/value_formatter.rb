@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module CLI
     # Value Object for consistent value formatting across all formatters

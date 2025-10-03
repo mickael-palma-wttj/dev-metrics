@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module CLI
     module Formatters
@@ -6,14 +8,14 @@ module DevMetrics
           {
             metadata: metadata,
             results: results.map(&:to_h),
-            summary: Services::SummaryGenerator.generate(results)
+            summary: Services::SummaryGenerator.generate(results),
           }.to_json
         end
 
         def format_analysis_results(results, summary)
           {
             summary: summary,
-            results: transform_analysis_results(results)
+            results: transform_analysis_results(results),
           }.to_json
         end
 
@@ -24,7 +26,7 @@ module DevMetrics
             {
               category: data[:metadata][:category],
               metric: data[:metric].to_h,
-              execution_time: data[:metadata][:execution_time]
+              execution_time: data[:metadata][:execution_time],
             }
           end
         end

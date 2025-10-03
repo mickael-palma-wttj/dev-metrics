@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module Metrics
     module Git
       module Reliability
         # Analyzes large commits that may indicate risky development practices
-        class LargeCommits < DevMetrics::BaseMetric
+        class LargeCommits < BaseMetric
           def metric_name
             'large_commits'
           end
@@ -45,13 +47,13 @@ module DevMetrics
                 large_commit_ratio: calculate_ratio(large_commits, total_commits),
                 huge_commit_ratio: calculate_ratio(huge_commits, total_commits),
                 risk_score: calculate_risk_score(large_commits, huge_commits, total_commits),
-                avg_commit_size: commit_sizes.empty? ? 0 : (commit_sizes.sum.to_f / commit_sizes.size).round(1)
+                avg_commit_size: commit_sizes.empty? ? 0 : (commit_sizes.sum.to_f / commit_sizes.size).round(1),
               },
               thresholds: thresholds,
               by_author: author_stats,
               largest_commits: categorized_commits[:huge] + categorized_commits[:large],
               size_distribution: analyze_size_distribution(commit_sizes),
-              risk_patterns: identify_risk_patterns(commits_data, commit_sizes)
+              risk_patterns: identify_risk_patterns(commits_data, commit_sizes),
             }
           end
 
@@ -98,7 +100,7 @@ module DevMetrics
               small: calculate_percentile(sorted_sizes, 25),
               medium: calculate_percentile(sorted_sizes, 50),
               large: calculate_percentile(sorted_sizes, 75),
-              huge: calculate_percentile(sorted_sizes, 90)
+              huge: calculate_percentile(sorted_sizes, 90),
             }
           end
 
@@ -109,7 +111,7 @@ module DevMetrics
               small: [],
               medium: [],
               large: [],
-              huge: []
+              huge: [],
             }
 
             commits_data.each_with_index do |commit, index|
@@ -152,7 +154,7 @@ module DevMetrics
                 avg_commit_size: 0.0,
                 max_commit_size: 0,
                 large_commit_ratio: 0.0,
-                risk_score: 0.0
+                risk_score: 0.0,
               }
             end
 
@@ -202,7 +204,7 @@ module DevMetrics
               p90: calculate_percentile(sorted_sizes, 90),
               p95: calculate_percentile(sorted_sizes, 95),
               p99: calculate_percentile(sorted_sizes, 99),
-              std_deviation: calculate_standard_deviation(commit_sizes)
+              std_deviation: calculate_standard_deviation(commit_sizes),
             }
           end
 
@@ -217,14 +219,14 @@ module DevMetrics
               large_commits << {
                 commit: commit,
                 size: size,
-                risk_factors: analyze_commit_risk_factors(commit, size, thresholds)
+                risk_factors: analyze_commit_risk_factors(commit, size, thresholds),
               }
             end
 
             {
               risky_commits: large_commits.sort_by { |c| -c[:size] }.first(20),
               common_risk_factors: aggregate_risk_factors(large_commits),
-              time_patterns: analyze_large_commit_timing(large_commits)
+              time_patterns: analyze_large_commit_timing(large_commits),
             }
           end
 
@@ -282,7 +284,7 @@ module DevMetrics
               by_hour_of_day: by_hour,
               by_day_of_week: by_day,
               peak_hour: by_hour.max_by { |_, count| count }&.first,
-              peak_day: by_day.max_by { |_, count| count }&.first
+              peak_day: by_day.max_by { |_, count| count }&.first,
             }
           end
 
@@ -302,13 +304,13 @@ module DevMetrics
           end
 
           def calculate_ratio(count, total)
-            return 0.0 if total == 0
+            return 0.0 if total.zero?
 
             (count.to_f / total * 100).round(2)
           end
 
           def calculate_risk_score(large_commits, huge_commits, total_commits)
-            return 0.0 if total_commits == 0
+            return 0.0 if total_commits.zero?
 
             # Weighted risk: huge commits are more risky than large ones
             risk_points = (large_commits * 1) + (huge_commits * 3)
@@ -318,7 +320,7 @@ module DevMetrics
           end
 
           def calculate_author_risk_score(large_commits, huge_commits, total_commits)
-            return 0.0 if total_commits == 0
+            return 0.0 if total_commits.zero?
 
             risk_points = (large_commits * 1) + (huge_commits * 3)
             max_risk_points = total_commits * 3

@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module Metrics
     module Git
       module CommitActivity
         # Calculates commits per developer over a time period
-        class CommitsPerDeveloper < DevMetrics::BaseMetric
+        class CommitsPerDeveloper < BaseMetric
           def metric_name
             'commits_per_developer'
           end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module CLI
     module Formatters

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module Models
     # Represents a Git repository with metadata and validation
@@ -51,7 +53,7 @@ module DevMetrics
           remote_url: remote_url,
           github_owner: github_owner,
           github_repo_name: github_repo_name,
-          valid: valid?
+          valid: valid?,
         }
       end
 

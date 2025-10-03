@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module Metrics
     module Git
       module CodeChurn
         # Analyzes how many authors have touched each file
-        class AuthorsPerFile < DevMetrics::BaseMetric
+        class AuthorsPerFile < BaseMetric
           def metric_name
             'authors_per_file'
           end
@@ -38,7 +40,7 @@ module DevMetrics
                 author_count: authors_set.size,
                 authors: authors_set.to_a.sort,
                 bus_factor_risk: categorize_bus_factor_risk(authors_set.size),
-                ownership_type: categorize_ownership(authors_set.size)
+                ownership_type: categorize_ownership(authors_set.size),
               }
             end
 
@@ -61,13 +63,13 @@ module DevMetrics
 
             super.merge(
               total_files_analyzed: total_files,
-              avg_authors_per_file: total_files > 0 ? (author_counts.sum.to_f / total_files).round(2) : 0,
+              avg_authors_per_file: total_files.positive? ? (author_counts.sum.to_f / total_files).round(2) : 0,
               max_authors_per_file: author_counts.max || 0,
               min_authors_per_file: author_counts.min || 0,
               single_author_files: single_author_files,
               shared_files: shared_files,
               highly_shared_files: highly_shared_files,
-              bus_factor_risk_percentage: total_files > 0 ? (single_author_files.to_f / total_files * 100).round(1) : 0,
+              bus_factor_risk_percentage: total_files.positive? ? (single_author_files.to_f / total_files * 100).round(1) : 0,
               collaboration_score: calculate_collaboration_score(result)
             )
           end
@@ -107,7 +109,7 @@ module DevMetrics
             collaborative = result.count { |_, s| s[:author_count] > 3 }
 
             # Weight the score: collaborative files get more points, penalize single owner
-            score = (shared * 50 + collaborative * 100 - single_owner * 10).to_f / total_files
+            score = ((shared * 50) + (collaborative * 100) - (single_owner * 10)).to_f / total_files
             [score, 100].min.round(1)
           end
         end

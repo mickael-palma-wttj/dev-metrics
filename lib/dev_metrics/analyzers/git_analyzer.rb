@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'time'
 
 module DevMetrics
@@ -36,13 +38,13 @@ module DevMetrics
               metadata: {
                 category: find_metric_category(metric_name),
                 execution_time: result.metadata[:execution_time],
-                data_points: result.metadata[:data_points] || 0
-              }
+                data_points: result.metadata[:data_points] || 0,
+              },
             }
           rescue StandardError => e
             errors[metric_name] = {
               error: e.class.name,
-              message: e.message
+              message: e.message,
             }
             puts "  ⚠️  Failed to analyze #{metric_name}: #{e.message}" unless options[:no_progress]
           end
@@ -61,14 +63,14 @@ module DevMetrics
 
         {
           total_metrics: @results.size,
-          categories: categories.transform_values { |metrics| metrics.size },
+          categories: categories.transform_values(&:size),
           execution_time: total_execution_time,
           data_coverage: calculate_data_coverage,
           repository_info: {
             name: repository.name,
             path: repository.path,
-            analyzed_at: Time.now.iso8601
-          }
+            analyzed_at: Time.now.iso8601,
+          },
         }
       end
 
@@ -87,7 +89,7 @@ module DevMetrics
         return false if options[:exclude_metrics]&.include?(metric_name.to_s)
 
         # Skip if contributors filter doesn't match
-        return has_contributor_data?(metric_name) if options[:contributors] && !options[:contributors].empty?
+        return contributor_data?(metric_name) if options[:contributors] && !options[:contributors].empty?
 
         true
       end
@@ -105,7 +107,7 @@ module DevMetrics
           time_period: build_time_period,
           contributors: options[:contributors] || [],
           exclude_bots: options[:exclude_bots] || false,
-          include_merge_commits: options[:include_merge_commits] || true
+          include_merge_commits: options[:include_merge_commits] || true,
         }
       end
 
@@ -146,7 +148,7 @@ module DevMetrics
         end
       end
 
-      def has_contributor_data?(metric_name)
+      def contributor_data?(_metric_name)
         # Simple heuristic: most Git metrics work with contributor filtering
         # In a more sophisticated implementation, we'd check metric capabilities
         true
@@ -174,7 +176,7 @@ module DevMetrics
       def calculate_data_coverage
         return 0 if @results.empty?
 
-        metrics_with_data = @results.count { |_, data| (data[:metadata][:data_points] || 0) > 0 }
+        metrics_with_data = @results.count { |_, data| (data[:metadata][:data_points] || 0).positive? }
         (metrics_with_data.to_f / @results.size * 100).round(1)
       end
     end

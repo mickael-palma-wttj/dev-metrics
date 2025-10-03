@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
-RSpec.describe DevMetrics::Models::TimePeriod do
+RSpec.describe Models::TimePeriod do
+  subject { described_class.new(start_date, end_date) }
+
   let(:start_date) { Time.now - (30 * 24 * 60 * 60) }
   let(:end_date) { Time.now }
-
-  subject { described_class.new(start_date, end_date) }
 
   it_behaves_like 'a model with hash conversion'
 

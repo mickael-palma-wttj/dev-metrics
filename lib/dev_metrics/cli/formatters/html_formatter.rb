@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module CLI
     module Formatters
@@ -28,14 +30,14 @@ module DevMetrics
         def render_metadata_details(metadata)
           return '' unless metadata
 
-          html = '<div class="metric-details">'
+          html = +'<div class="metric-details">'
           skip_keys = %i[data_points data_points_label computed_at execution_time]
 
           metadata.each do |key, value|
             next if skip_keys.include?(key)
 
             html << '<div class="metric-detail">'
-            html << "<strong>#{DevMetrics::Utils::StringUtils.humanize(key.to_s)}:</strong> "
+            html << "<strong>#{Utils::StringUtils.humanize(key.to_s)}:</strong> "
             html << ValueFormatter.format_metadata_value(value)
             html << '</div>'
           end
@@ -53,15 +55,15 @@ module DevMetrics
         end
 
         def format_execution_time(time_seconds)
-          DevMetrics::Utils::StringUtils.format_execution_time(time_seconds)
+          Utils::StringUtils.format_execution_time(time_seconds)
         end
 
         def humanize_string(str)
-          DevMetrics::Utils::StringUtils.humanize(str)
+          Utils::StringUtils.humanize(str)
         end
 
         def truncate_text(text, length)
-          DevMetrics::Utils::StringUtils.truncate(text, length)
+          Utils::StringUtils.truncate(text, length)
         end
 
         def group_analysis_results(results)
@@ -100,7 +102,7 @@ module DevMetrics
             '<html><head><title>Developer Metrics Report</title>',
             build_css_styles,
             '</head><body>',
-            '<h1>Developer Metrics Report</h1>'
+            '<h1>Developer Metrics Report</h1>',
           ]
         end
 
@@ -114,7 +116,7 @@ module DevMetrics
             '.success { border-left: 4px solid #4CAF50; }',
             '.error { border-left: 4px solid #f44336; }',
             '.metadata { background: #e3f2fd; padding: 15px; margin-bottom: 20px; }',
-            '</style>'
+            '</style>',
           ].join("\n")
         end
 

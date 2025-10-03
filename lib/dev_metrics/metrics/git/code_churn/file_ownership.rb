@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module Metrics
     module Git
       module CodeChurn
         # Identifies the primary owner (last significant contributor) of each file
-        class FileOwnership < DevMetrics::BaseMetric
+        class FileOwnership < BaseMetric
           def metric_name
             'file_ownership'
           end
@@ -34,7 +36,7 @@ module DevMetrics
                   author: commit[:author_name],
                   date: commit[:date],
                   changes: changes,
-                  hash: commit[:hash]
+                  hash: commit[:hash],
                 }
 
                 file_data[filename][:authors][commit[:author_name]] += changes
@@ -67,7 +69,7 @@ module DevMetrics
                 contributor_count: data[:authors].size,
                 ownership_distribution: author_percentages.sort_by { |_, pct| -pct }.to_h,
                 ownership_concentration: calculate_ownership_concentration(author_percentages),
-                ownership_type: categorize_ownership_type(author_percentages)
+                ownership_type: categorize_ownership_type(author_percentages),
               }
             end
 

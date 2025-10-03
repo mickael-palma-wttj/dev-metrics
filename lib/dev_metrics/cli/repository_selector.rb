@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module CLI
     # Handles Git repository detection and selection
@@ -11,11 +13,11 @@ module DevMetrics
       def find_repositories(recursive: false)
         repositories = []
 
-        repositories << DevMetrics::Models::Repository.new(base_path) if git_repository?(base_path)
+        repositories << Models::Repository.new(base_path) if git_repository?(base_path)
 
         repositories.concat(find_nested_repositories) if recursive
 
-        repositories.uniq { |repo| repo.path }
+        repositories.uniq(&:path)
       end
 
       def interactive_select(repositories)
@@ -57,7 +59,7 @@ module DevMetrics
           next if nested_in_git_repo?(dir)
 
           begin
-            repositories << DevMetrics::Models::Repository.new(dir)
+            repositories << Models::Repository.new(dir)
           rescue ArgumentError
             # Skip invalid repositories
           end
@@ -89,7 +91,7 @@ module DevMetrics
           else
             # Handle single numbers
             num = part.to_i
-            indices << num - 1 if valid_number?(num, max_count)
+            indices << (num - 1) if valid_number?(num, max_count)
           end
         end
 
@@ -100,11 +102,11 @@ module DevMetrics
       end
 
       def valid_number?(num, max_count)
-        num > 0 && num <= max_count
+        num.positive? && num <= max_count
       end
 
       def valid_range?(start_num, end_num, max_count)
-        start_num > 0 && end_num <= max_count && start_num <= end_num
+        start_num.positive? && end_num <= max_count && start_num <= end_num
       end
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Shared examples for metric classes
 RSpec.shared_examples 'a metric' do
   it 'responds to calculate' do
@@ -6,7 +8,7 @@ RSpec.shared_examples 'a metric' do
 
   it 'returns a MetricResult' do
     result = subject.calculate
-    expect(result).to be_a(DevMetrics::MetricResult)
+    expect(result).to be_a(MetricResult)
   end
 
   it 'has a metric name' do

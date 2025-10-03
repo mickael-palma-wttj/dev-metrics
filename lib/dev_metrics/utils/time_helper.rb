@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module Utils
     # Utility module for time-related operations and working hours calculations
     module TimeHelper
       WORKING_HOURS_START = 9
       WORKING_HOURS_END = 18
-      WEEKEND_DAYS = [0, 6] # Sunday and Saturday
+      WEEKEND_DAYS = [0, 6].freeze # Sunday and Saturday
 
       def working_hours?(timestamp)
         time = parse_time(timestamp)
@@ -70,10 +72,10 @@ module DevMetrics
         secs = seconds % 60
 
         parts = []
-        parts << "#{days.to_i}d" if days > 0
-        parts << "#{hours.to_i}h" if hours > 0
-        parts << "#{minutes.to_i}m" if minutes > 0
-        parts << "#{secs.to_i}s" if secs > 0 && parts.empty?
+        parts << "#{days.to_i}d" if days.positive?
+        parts << "#{hours.to_i}h" if hours.positive?
+        parts << "#{minutes.to_i}m" if minutes.positive?
+        parts << "#{secs.to_i}s" if secs.positive? && parts.empty?
 
         parts.join(' ')
       end

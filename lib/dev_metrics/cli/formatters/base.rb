@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module CLI
     module Formatters
@@ -33,19 +35,19 @@ module DevMetrics
 
         # Helper methods available in templates
         def format_execution_time(time_seconds)
-          DevMetrics::Utils::StringUtils.format_execution_time(time_seconds)
+          Utils::StringUtils.format_execution_time(time_seconds)
         end
 
         def humanize_string(str)
-          DevMetrics::Utils::StringUtils.humanize(str)
+          Utils::StringUtils.humanize(str)
         end
 
         def titleize_string(str)
-          DevMetrics::Utils::StringUtils.titleize(str)
+          Utils::StringUtils.titleize(str)
         end
 
         def truncate_text(text, length)
-          DevMetrics::Utils::StringUtils.truncate(text, length)
+          Utils::StringUtils.truncate(text, length)
         end
 
         private
@@ -53,7 +55,7 @@ module DevMetrics
         def create_template_binding(data)
           template_binding = binding
           data.each { |key, value| template_binding.local_variable_set(key, value) }
-          template_binding.local_variable_set(:string_utils, DevMetrics::Utils::StringUtils)
+          template_binding.local_variable_set(:string_utils, Utils::StringUtils)
           template_binding
         end
       end

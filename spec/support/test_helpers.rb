@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'tmpdir'
 require 'fileutils'
 
@@ -19,7 +21,7 @@ module TestHelpers
     end
 
     (@test_repositories ||= []) << repo_path
-    DevMetrics::Models::Repository.new(repo_path)
+    Models::Repository.new(repo_path)
   end
 
   # Creates test commits with specific patterns
@@ -42,7 +44,7 @@ module TestHelpers
           'GIT_AUTHOR_DATE' => date.to_s,
           'GIT_COMMITTER_NAME' => author.split('<').first.strip,
           'GIT_COMMITTER_EMAIL' => author.match(/<(.+)>/)[1],
-          'GIT_COMMITTER_DATE' => date.to_s
+          'GIT_COMMITTER_DATE' => date.to_s,
         }
 
         system(env_vars, "git commit -m '#{message}' --quiet")
@@ -51,7 +53,7 @@ module TestHelpers
   end
 
   # Mock GitHub API responses
-  def mock_github_api_response(endpoint, response_data)
+  def mock_github_api_response(_endpoint, response_data)
     # Simple mock for testing - in real implementation would use WebMock or similar
     allow_any_instance_of(Net::HTTP).to receive(:request).and_return(
       double('response', body: response_data.to_json, code: '200')
@@ -63,20 +65,20 @@ module TestHelpers
     return unless @test_repositories
 
     @test_repositories.each do |repo_path|
-      FileUtils.rm_rf(repo_path) if File.exist?(repo_path)
+      FileUtils.rm_rf(repo_path)
     end
     @test_repositories.clear
   end
 
   # Create test contributors
   def create_test_contributor(name = 'John Doe', email = 'john@example.com')
-    DevMetrics::Models::Contributor.new(name, email)
+    Models::Contributor.new(name, email)
   end
 
   # Create test time period
   def create_test_time_period(days_ago = 30)
     start_date = Time.now - (days_ago * 24 * 60 * 60)
-    DevMetrics::Models::TimePeriod.new(start_date, Time.now)
+    Models::TimePeriod.new(start_date, Time.now)
   end
 end
 

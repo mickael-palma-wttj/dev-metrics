@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'time'
 require 'fileutils'
 
@@ -54,12 +56,12 @@ module DevMetrics
           since: extract_option('--since'),
           until: extract_option('--until'),
           contributors: extract_contributors,
-          interactive: has_flag?('--interactive'),
-          recursive: has_flag?('--recursive'),
-          exclude_bots: has_flag?('--exclude-bots'),
-          include_merge_commits: !has_flag?('--exclude-merges'),
-          no_progress: has_flag?('--no-progress'),
-          all_time: has_flag?('--all-time')
+          interactive: flag?('--interactive'),
+          recursive: flag?('--recursive'),
+          exclude_bots: flag?('--exclude-bots'),
+          include_merge_commits: !flag?('--exclude-merges'),
+          no_progress: flag?('--no-progress'),
+          all_time: flag?('--all-time'),
         }
 
         validate_options(options)
@@ -122,7 +124,6 @@ module DevMetrics
         case options[:metrics]
         when 'git' then %i[commit_activity code_churn reliability flow]
         when 'all' then nil # All categories
-        else nil
         end
       end
 
@@ -153,7 +154,7 @@ module DevMetrics
         end
       end
 
-      def has_flag?(flag)
+      def flag?(flag)
         args.any? { |arg| arg == flag }
       end
 
@@ -184,7 +185,7 @@ module DevMetrics
         puts "Analyzing repository at: #{options[:path]}"
 
         begin
-          repository = DevMetrics::Models::Repository.new(options[:path])
+          repository = Models::Repository.new(options[:path])
 
           # Validate repository has Git data
           unless repository.git_repository?
@@ -199,13 +200,13 @@ module DevMetrics
           puts ''
 
           # Run Git metrics analysis
-          analyzer = DevMetrics::Analyzers::GitAnalyzer.new(repository, options)
+          analyzer = Analyzers::GitAnalyzer.new(repository, options)
 
           categories = extract_git_categories
           results = analyzer.analyze(options[:metrics], categories)
 
           # Format and output results
-          formatter = DevMetrics::CLI::OutputFormatter.new(options[:format])
+          formatter = CLI::OutputFormatter.new(options[:format])
           output = formatter.format_analysis_results(results, analyzer.summary)
 
           write_output(output)
@@ -224,7 +225,7 @@ module DevMetrics
       def run_scan
         puts "Scanning for repositories in: #{options[:path]}"
 
-        selector = DevMetrics::CLI::RepositorySelector.new(options[:path])
+        selector = CLI::RepositorySelector.new(options[:path])
         repositories = selector.find_repositories(recursive: options[:recursive])
 
         if repositories.empty?
@@ -255,15 +256,15 @@ module DevMetrics
       def build_time_period
         if options[:all_time]
           # Create repository to get first commit date
-          repository = DevMetrics::Models::Repository.new(options[:path])
+          repository = Models::Repository.new(options[:path])
           first_commit_date = get_first_commit_date(repository)
-          DevMetrics::Models::TimePeriod.new(first_commit_date, Time.now)
+          Models::TimePeriod.new(first_commit_date, Time.now)
         elsif options[:since] || options[:until]
           start_date = parse_time_option(options[:since]) || 30
           end_date = parse_time_option(options[:until]) || Time.now
-          DevMetrics::Models::TimePeriod.new(start_date, end_date)
+          Models::TimePeriod.new(start_date, end_date)
         else
-          DevMetrics::Models::TimePeriod.default
+          Models::TimePeriod.default
         end
       end
 
@@ -290,7 +291,7 @@ module DevMetrics
 
       def get_first_commit_date(repository)
         # Use GitCommand to get the first commit date
-        git_command = DevMetrics::Utils::GitCommand.new(repository.path)
+        git_command = Utils::GitCommand.new(repository.path)
 
         # Get the oldest commit directly using log with reverse order
         # Use --all to include all branches and limit to first result

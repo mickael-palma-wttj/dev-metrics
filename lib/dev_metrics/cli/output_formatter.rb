@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'json'
 
 module DevMetrics
@@ -9,7 +11,7 @@ module DevMetrics
         'json' => Formatters::JsonFormatter,
         'csv' => Formatters::CsvFormatter,
         'html' => Formatters::HtmlFormatter,
-        'markdown' => Formatters::MarkdownFormatter
+        'markdown' => Formatters::MarkdownFormatter,
       }.freeze
 
       attr_reader :format, :output_file, :template_renderer

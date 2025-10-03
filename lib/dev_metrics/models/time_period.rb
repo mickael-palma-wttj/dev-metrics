@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'time'
 require 'date'
 
@@ -40,7 +42,7 @@ module DevMetrics
         {
           start_date: start_date,
           end_date: end_date,
-          duration_days: duration_days
+          duration_days: duration_days,
         }
       end
 
@@ -50,7 +52,7 @@ module DevMetrics
 
       def contains?(date)
         parsed_date = parse_date(date)
-        parsed_date >= start_date && parsed_date <= end_date
+        parsed_date.between?(start_date, end_date)
       end
 
       def to_s

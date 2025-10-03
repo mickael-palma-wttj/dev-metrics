@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module Utils
     # Shared production tag patterns for consistent deployment identification
@@ -30,7 +32,7 @@ module DevMetrics
         /^v\d{8}[-_]\d+$/,                               # v20241024_1, v20240109-1
 
         # Simple version numbers
-        /^v\d+$/ # v31, v30, v29, etc.
+        /^v\d+$/, # v31, v30, v29, etc.
       ].freeze
 
       # Check if a tag name matches production patterns

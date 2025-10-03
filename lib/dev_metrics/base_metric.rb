@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DevMetrics
   # Base class for all metric calculations
   # Implements Template Method pattern for consistent metric computation workflow
@@ -14,23 +16,15 @@ module DevMetrics
 
     # Template method - defines the algorithm structure
     def calculate
-      start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-
       validate_inputs
-      raw_data = collect_data
-      processed_data = process_data(raw_data)
-      result = compute_metric(processed_data)
 
-      end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      execution_time = (end_time - start_time).round(3)
+      execution_time = measure_execution_time do
+        processed_data = collect_and_process_data
+        { processed_data: processed_data, result: compute_metric(processed_data) }
+      end
 
-      Models::MetricResult.new(
-        metric_name: metric_name,
-        value: result,
-        repository: repository.name,
-        time_period: time_period,
-        metadata: build_metadata(processed_data).merge(execution_time: execution_time)
-      )
+      build_result(execution_time[:result][:result], execution_time[:result][:processed_data],
+                   execution_time[:duration])
     rescue StandardError => e
       handle_error(e)
     end
@@ -67,7 +61,7 @@ module DevMetrics
         data_points: data_points,
         data_points_label: data_points_description,
         computed_at: Time.now,
-        options_used: options
+        options_used: options,
       }
     end
 
@@ -77,6 +71,29 @@ module DevMetrics
     end
 
     private
+
+    def measure_execution_time
+      start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      result = yield
+      end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
+      { result: result, duration: (end_time - start_time).round(3) }
+    end
+
+    def collect_and_process_data
+      raw_data = collect_data
+      process_data(raw_data)
+    end
+
+    def build_result(result, processed_data, execution_time)
+      Models::MetricResult.new(
+        metric_name: metric_name,
+        value: result,
+        repository: repository.name,
+        time_period: time_period,
+        metadata: build_metadata(processed_data).merge(execution_time: execution_time)
+      )
+    end
 
     def validate_inputs
       raise ArgumentError, 'Repository cannot be nil' if repository.nil?

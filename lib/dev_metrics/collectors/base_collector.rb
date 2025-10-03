@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module Collectors
     # Base class for all data collectors

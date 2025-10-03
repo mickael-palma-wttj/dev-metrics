@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module Metrics
     module Git
       module Reliability
         # Analyzes the ratio of bugfix commits to identify code quality patterns
-        class BugfixRatio < DevMetrics::BaseMetric
+        class BugfixRatio < BaseMetric
           def metric_name
             'bugfix_ratio'
           end
@@ -43,15 +45,15 @@ module DevMetrics
                 bugfix_ratio: calculate_ratio(bugfix_commits, total_commits),
                 feature_ratio: calculate_ratio(feature_commits, total_commits),
                 maintenance_ratio: calculate_ratio(maintenance_commits, total_commits),
-                quality_score: calculate_quality_score(bugfix_commits, feature_commits)
+                quality_score: calculate_quality_score(bugfix_commits, feature_commits),
               },
               by_author: author_stats,
               commit_categories: {
                 bugfix: categorized_commits[:bugfix].first(10),
                 feature: categorized_commits[:feature].first(10),
-                maintenance: categorized_commits[:maintenance].first(10)
+                maintenance: categorized_commits[:maintenance].first(10),
               },
-              time_patterns: analyze_bugfix_patterns(categorized_commits[:bugfix])
+              time_patterns: analyze_bugfix_patterns(categorized_commits[:bugfix]),
             }
           end
 
@@ -77,7 +79,7 @@ module DevMetrics
               bugfix: [],
               feature: [],
               maintenance: [],
-              other: []
+              other: [],
             }
 
             commits_data.each do |commit|
@@ -101,7 +103,7 @@ module DevMetrics
               /\bpatch/,
               /\bcorrect/,
               /\brepair/,
-              /\bhandle\s+(error|exception)/
+              /\bhandle\s+(error|exception)/,
             ]
 
             # Feature patterns
@@ -115,7 +117,7 @@ module DevMetrics
               /\benhance/,
               /\bimprove/,
               /\bupgrade/,
-              /\bextend/
+              /\bextend/,
             ]
 
             # Maintenance patterns
@@ -135,7 +137,7 @@ module DevMetrics
               /\bwhitespace/,
               /\breorg/,
               /\bmove\s/,
-              /\brename/
+              /\brename/,
             ]
 
             return :bugfix if bugfix_patterns.any? { |pattern| message.match?(pattern) }
@@ -154,7 +156,7 @@ module DevMetrics
                 maintenance_commits: 0,
                 bugfix_ratio: 0.0,
                 feature_ratio: 0.0,
-                quality_score: 1.0
+                quality_score: 1.0,
               }
             end
 
@@ -179,9 +181,9 @@ module DevMetrics
             end
 
             # Calculate ratios and scores
-            stats.each do |author, data|
+            stats.each_value do |data|
               total = data[:total_commits]
-              next if total == 0
+              next if total.zero?
 
               data[:bugfix_ratio] = calculate_ratio(data[:bugfix_commits], total)
               data[:feature_ratio] = calculate_ratio(data[:feature_commits], total)
@@ -211,7 +213,7 @@ module DevMetrics
               by_month: by_month,
               peak_bugfix_hour: by_hour.max_by { |_, count| count }&.first,
               peak_bugfix_day: by_day.max_by { |_, count| count }&.first,
-              urgency_indicators: identify_urgency_patterns(bugfix_commits)
+              urgency_indicators: identify_urgency_patterns(bugfix_commits),
             }
           end
 
@@ -238,19 +240,19 @@ module DevMetrics
               urgency_keywords: urgency_counts,
               severity_keywords: severity_counts,
               urgent_fixes: urgency_counts.values.sum,
-              urgent_ratio: calculate_ratio(urgency_counts.values.sum, bugfix_commits.size)
+              urgent_ratio: calculate_ratio(urgency_counts.values.sum, bugfix_commits.size),
             }
           end
 
           def calculate_ratio(count, total)
-            return 0.0 if total == 0
+            return 0.0 if total.zero?
 
             (count.to_f / total * 100).round(2)
           end
 
           def calculate_quality_score(bugfix_commits, feature_commits)
             total_productive = bugfix_commits + feature_commits
-            return 1.0 if total_productive == 0
+            return 1.0 if total_productive.zero?
 
             # Higher feature ratio = higher quality score
             feature_ratio = feature_commits.to_f / total_productive
@@ -281,7 +283,7 @@ module DevMetrics
             first_avg = first_half.sum { |month| monthly_data[month] } / first_half.size.to_f
             second_avg = second_half.sum { |month| monthly_data[month] } / second_half.size.to_f
 
-            return 0 if first_avg == 0
+            return 0 if first_avg.zero?
 
             ((second_avg - first_avg) / first_avg * 100).round(1)
           end

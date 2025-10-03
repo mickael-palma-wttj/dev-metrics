@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module Models
     # Represents a contributor with identity resolution and metadata
@@ -32,7 +34,7 @@ module DevMetrics
           name: name,
           email: email,
           aliases: aliases,
-          primary_identity: primary_identity
+          primary_identity: primary_identity,
         }
       end
 
@@ -53,8 +55,8 @@ module DevMetrics
 
         # Remove common Git artifacts and normalize
         normalized = name.strip
-                         .gsub(/\s+/, ' ')
-                         .gsub(/[<>]/, '')
+          .gsub(/\s+/, ' ')
+          .gsub(/[<>]/, '')
 
         # Handle common patterns like "Name (Company)" -> "Name"
         normalized.gsub(/\s*\([^)]+\)$/, '')

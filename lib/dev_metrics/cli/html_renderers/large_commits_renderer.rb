@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module CLI
     module HtmlRenderers
@@ -8,7 +10,7 @@ module DevMetrics
           [
             render_overall_statistics,
             render_thresholds,
-            render_largest_commits_table
+            render_largest_commits_table,
           ].compact.join
         end
 
@@ -24,7 +26,7 @@ module DevMetrics
                 metric_detail('Total commits', overall[:total_commits], 'count'),
                 metric_detail('Large commits', large_commits_text, 'count'),
                 metric_detail('Huge commits', huge_commits_text, 'count'),
-                metric_detail('Risk score', overall[:risk_score], risk_css_class)
+                metric_detail('Risk score', overall[:risk_score], risk_css_class),
               ].join
             end
           end
@@ -49,10 +51,10 @@ module DevMetrics
             data_table(%w[Date Author Size Message]) do
               @value[:largest_commits].first(5).map do |commit|
                 table_row([
-                            commit[:date].to_s.split(' ').first,
+                            commit[:date].to_s.split.first,
                             commit[:author_name],
                             "<span class=\"count\">#{commit[:calculated_size]} lines</span>",
-                            DevMetrics::Utils::StringUtils.truncate(commit[:subject], 50)
+                            Utils::StringUtils.truncate(commit[:subject], 50),
                           ])
               end.join
             end

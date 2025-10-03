@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'time'
 
 module DevMetrics
@@ -7,7 +9,7 @@ module DevMetrics
       attr_reader :git_command
 
       def initialize(repository, options = {})
-        super(repository, options)
+        super
         @git_command = Utils::GitCommand.new(repository.path)
       end
 
@@ -94,7 +96,7 @@ module DevMetrics
             name: parts[0],
             tag_name: parts[0], # alias for compatibility
             date: Time.parse(parts[1]),
-            repository: repository.name
+            repository: repository.name,
           }
         end
 
@@ -135,7 +137,7 @@ module DevMetrics
             author_email: parts[2],
             date: Time.parse(parts[3]),
             message: parts[4],
-            repository: repository.name
+            repository: repository.name,
           }
         end
 
@@ -167,7 +169,7 @@ module DevMetrics
               repository: repository.name,
               files_changed: [],
               additions: 0,
-              deletions: 0
+              deletions: 0,
             }
             commits << current_commit
           elsif current_commit && line.match(/^(\d+|-)\s+(\d+|-)\s+(.+)$/)
@@ -180,7 +182,7 @@ module DevMetrics
             current_commit[:files_changed] << {
               filename: filename,
               additions: additions,
-              deletions: deletions
+              deletions: deletions,
             }
 
             current_commit[:additions] += additions
@@ -247,7 +249,7 @@ module DevMetrics
             name: name,
             email: email,
             commit_count: commit_count,
-            repository: repository.name
+            repository: repository.name,
           }
         end
 

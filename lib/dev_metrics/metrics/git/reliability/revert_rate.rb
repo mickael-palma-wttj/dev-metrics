@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module Metrics
     module Git
       module Reliability
         # Analyzes the rate of reverted commits and problematic changes
-        class RevertRate < DevMetrics::BaseMetric
+        class RevertRate < BaseMetric
           def metric_name
             'revert_rate'
           end
@@ -43,11 +45,11 @@ module DevMetrics
                 reverted_commits: total_reverted,
                 revert_rate: calculate_rate(total_reverts, total_commits),
                 reverted_rate: calculate_rate(total_reverted, total_commits),
-                stability_score: calculate_stability_score(total_reverted, total_commits)
+                stability_score: calculate_stability_score(total_reverted, total_commits),
               },
               by_author: author_stats,
               revert_details: build_revert_details(revert_commits, reverted_commits),
-              time_patterns: analyze_revert_patterns(revert_commits)
+              time_patterns: analyze_revert_patterns(revert_commits),
             }
           end
 
@@ -75,7 +77,7 @@ module DevMetrics
               /^This reverts commit/i,
               /reverts?\s+commit/i,
               /^Rollback/i,
-              /^Undo\s+/i
+              /^Undo\s+/i,
             ]
 
             commits_data.select do |commit|
@@ -107,7 +109,7 @@ module DevMetrics
                 commits_reverted: 0,
                 revert_rate: 0.0,
                 reverted_rate: 0.0,
-                reliability_score: 1.0
+                reliability_score: 1.0,
               }
             end
 
@@ -130,9 +132,9 @@ module DevMetrics
             end
 
             # Calculate rates and scores
-            stats.each do |author, data|
+            stats.each_value do |data|
               total = data[:total_commits]
-              next if total == 0
+              next if total.zero?
 
               data[:revert_rate] = calculate_rate(data[:reverts_made], total)
               data[:reverted_rate] = calculate_rate(data[:commits_reverted], total)
@@ -146,7 +148,7 @@ module DevMetrics
             {
               recent_reverts: revert_commits.first(10),
               recent_reverted: reverted_commits.first(10),
-              revert_reasons: categorize_revert_reasons(revert_commits)
+              revert_reasons: categorize_revert_reasons(revert_commits),
             }
           end
 
@@ -166,7 +168,7 @@ module DevMetrics
               by_hour_of_day: by_hour,
               by_day_of_week: by_day,
               peak_revert_hour: by_hour.max_by { |_, count| count }&.first,
-              peak_revert_day: by_day.max_by { |_, count| count }&.first
+              peak_revert_day: by_day.max_by { |_, count| count }&.first,
             }
           end
 
@@ -196,20 +198,20 @@ module DevMetrics
           end
 
           def calculate_rate(count, total)
-            return 0.0 if total == 0
+            return 0.0 if total.zero?
 
             (count.to_f / total * 100).round(2)
           end
 
           def calculate_stability_score(reverted_commits, total_commits)
-            return 1.0 if total_commits == 0
+            return 1.0 if total_commits.zero?
 
             stability = 1.0 - (reverted_commits.to_f / total_commits)
             [stability, 0.0].max.round(3)
           end
 
           def calculate_reliability_score(reverted_commits, total_commits)
-            return 1.0 if total_commits == 0
+            return 1.0 if total_commits.zero?
 
             reliability = 1.0 - (reverted_commits.to_f / total_commits)
             [reliability, 0.0].max.round(3)

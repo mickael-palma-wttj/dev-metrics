@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module Metrics
     module Git
       module CommitActivity
         # Analyzes lines added, removed, and net changes by author
-        class LinesChanged < DevMetrics::BaseMetric
+        class LinesChanged < BaseMetric
           def metric_name
             'lines_changed'
           end
@@ -48,8 +50,8 @@ module DevMetrics
                 net_changes: net_changes,
                 total_changes: total_changes,
                 commits: stats[:commits],
-                avg_changes_per_commit: stats[:commits] > 0 ? (total_changes.to_f / stats[:commits]).round(2) : 0,
-                churn_ratio: total_changes > 0 ? (stats[:deletions].to_f / total_changes * 100).round(1) : 0
+                avg_changes_per_commit: stats[:commits].positive? ? (total_changes.to_f / stats[:commits]).round(2) : 0,
+                churn_ratio: total_changes.positive? ? (stats[:deletions].to_f / total_changes * 100).round(1) : 0,
               }
             end
 
@@ -71,9 +73,9 @@ module DevMetrics
               total_deletions: total_deletions,
               net_additions: total_additions - total_deletions,
               total_changes: total_changes,
-              overall_churn_ratio: total_changes > 0 ? (total_deletions.to_f / total_changes * 100).round(1) : 0,
+              overall_churn_ratio: total_changes.positive? ? (total_deletions.to_f / total_changes * 100).round(1) : 0,
               contributing_authors: authors.size,
-              avg_changes_per_author: authors.size > 0 ? (total_changes.to_f / authors.size).round(2) : 0
+              avg_changes_per_author: authors.size.positive? ? (total_changes.to_f / authors.size).round(2) : 0
             )
           end
         end

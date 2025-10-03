@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module Metrics
     module Git
       module Flow
         # Analyzes lead time from commit to production deployment
-        class LeadTime < DevMetrics::BaseMetric
+        class LeadTime < BaseMetric
           def metric_name
             'lead_time'
           end
@@ -18,7 +20,7 @@ module DevMetrics
             collector = Collectors::GitCollector.new(repository, options)
             {
               commits: collector.collect_commits(time_period),
-              tags: collector.collect_tags
+              tags: collector.collect_tags,
             }
           end
 
@@ -49,13 +51,13 @@ module DevMetrics
                 p95_lead_time_hours: calculate_percentile(lead_times.sort, 95),
                 min_lead_time_hours: lead_times.min || 0,
                 max_lead_time_hours: lead_times.max || 0,
-                flow_efficiency: calculate_flow_efficiency(lead_times)
+                flow_efficiency: calculate_flow_efficiency(lead_times),
               },
               by_author: author_stats,
               production_releases: production_releases.first(10),
               lead_time_distribution: analyze_lead_time_distribution(lead_times),
               bottleneck_analysis: identify_bottlenecks(commit_lead_times),
-              trends: analyze_lead_time_trends(commit_lead_times)
+              trends: analyze_lead_time_trends(commit_lead_times),
             }
           end
 
@@ -127,7 +129,7 @@ module DevMetrics
                 median_lead_time_hours: 0.0,
                 min_lead_time_hours: Float::INFINITY,
                 max_lead_time_hours: 0.0,
-                deployment_rate: 0.0
+                deployment_rate: 0.0,
               }
             end
 
@@ -156,10 +158,10 @@ module DevMetrics
             end
 
             # Calculate deployment rate
-            stats.each do |author, data|
+            stats.each_value do |data|
               total = data[:total_commits]
               deployed = data[:commits_deployed]
-              data[:deployment_rate] = total > 0 ? (deployed.to_f / total * 100).round(2) : 0.0
+              data[:deployment_rate] = total.positive? ? (deployed.to_f / total * 100).round(2) : 0.0
             end
 
             stats.sort_by { |_, data| data[:avg_lead_time_hours] }.to_h
@@ -174,17 +176,17 @@ module DevMetrics
               quartiles: {
                 q1: calculate_percentile(sorted_times, 25),
                 q2: calculate_percentile(sorted_times, 50),
-                q3: calculate_percentile(sorted_times, 75)
+                q3: calculate_percentile(sorted_times, 75),
               },
               percentiles: {
                 p50: calculate_percentile(sorted_times, 50),
                 p75: calculate_percentile(sorted_times, 75),
                 p90: calculate_percentile(sorted_times, 90),
                 p95: calculate_percentile(sorted_times, 95),
-                p99: calculate_percentile(sorted_times, 99)
+                p99: calculate_percentile(sorted_times, 99),
               },
               categories: categorize_lead_times(lead_times),
-              outliers: identify_lead_time_outliers(sorted_times)
+              outliers: identify_lead_time_outliers(sorted_times),
             }
           end
 
@@ -194,7 +196,7 @@ module DevMetrics
               fast: 0,         # 4-24 hours
               moderate: 0,     # 1-7 days
               slow: 0,         # 1-4 weeks
-              very_slow: 0     # > 4 weeks
+              very_slow: 0, # > 4 weeks
             }
 
             lead_times.each do |hours|
@@ -233,9 +235,9 @@ module DevMetrics
               high_lead_time_commits: high_lead_time_commits.first(20),
               common_bottleneck_factors: common_factors,
               bottleneck_authors: high_lead_time_commits.group_by { |c| c[:author] }
-                                                        .transform_values(&:size)
-                                                        .sort_by { |_, count| -count }
-                                                        .to_h
+                .transform_values(&:size)
+                .sort_by { |_, count| -count }
+                .to_h,
             }
           end
 
@@ -281,7 +283,7 @@ module DevMetrics
             {
               monthly_averages: monthly_averages,
               trend_direction: calculate_trend_direction(sorted_months, monthly_averages),
-              improvement_rate: calculate_improvement_rate(sorted_months, monthly_averages)
+              improvement_rate: calculate_improvement_rate(sorted_months, monthly_averages),
             }
           end
 
@@ -352,7 +354,7 @@ module DevMetrics
             first_avg = monthly_averages[first_month]
             last_avg = monthly_averages[last_month]
 
-            return 0 if first_avg == 0
+            return 0 if first_avg.zero?
 
             ((first_avg - last_avg) / first_avg * 100).round(1)
           end

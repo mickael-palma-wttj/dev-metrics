@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module CLI
     module HtmlRenderers
@@ -28,7 +30,7 @@ module DevMetrics
                   "#{overall[:feature_commits]} (#{overall[:feature_ratio]}%)",
                   'count'
                 ),
-                metric_detail('Quality score', overall[:quality_score], 'percentage')
+                metric_detail('Quality score', overall[:quality_score], 'percentage'),
               ].join
             end
           end

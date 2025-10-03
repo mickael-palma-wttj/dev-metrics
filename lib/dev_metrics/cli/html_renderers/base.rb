@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module CLI
     module HtmlRenderers
@@ -40,7 +42,7 @@ module DevMetrics
           "<div class=\"metric-detail\"><strong>#{label}:</strong> <span#{span_class}>#{value}</span></div>"
         end
 
-        def data_table(headers, &block)
+        def data_table(headers)
           header_row = headers.map { |h| "<th>#{h}</th>" }.join
           "<table class=\"data-table\"><tr>#{header_row}</tr>#{yield}</table>"
         end

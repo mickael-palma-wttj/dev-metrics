@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../lib/dev_metrics'
 
 # Load support files
@@ -23,7 +25,7 @@ RSpec.configure do |config|
   Kernel.srand config.seed
 
   # Clean up test data after each test
-  config.after(:each) do
+  config.after do
     # Clean up any temporary files or test repositories
     cleanup_test_repositories if respond_to?(:cleanup_test_repositories)
   end

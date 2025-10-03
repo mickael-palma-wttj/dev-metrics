@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module Metrics
     module Git
       module CommitActivity
         # Analyzes commit frequency patterns over time
-        class CommitFrequency < DevMetrics::BaseMetric
+        class CommitFrequency < BaseMetric
           include Utils::TimeHelper
 
           def metric_name
@@ -32,7 +34,7 @@ module DevMetrics
               working_hours_commits: calculate_working_hours_split(commits_data),
               busiest_day: find_busiest_day(commits_data),
               busiest_hour: find_busiest_hour(commits_data),
-              consistency_score: calculate_consistency_score(commits_data)
+              consistency_score: calculate_consistency_score(commits_data),
             }
           end
 
@@ -54,13 +56,13 @@ module DevMetrics
 
           def calculate_commits_per_day(commits_data)
             daily_counts = commits_data.group_by { |c| c[:date].strftime('%Y-%m-%d') }
-                                       .transform_values(&:count)
+              .transform_values(&:count)
 
             {
               by_date: daily_counts,
               average: (daily_counts.values.sum.to_f / daily_counts.size).round(2),
               max: daily_counts.values.max,
-              min: daily_counts.values.min
+              min: daily_counts.values.min,
             }
           end
 
@@ -98,20 +100,20 @@ module DevMetrics
               working_hours: working_hours_count,
               off_hours: off_hours_count,
               working_hours_percentage: (working_hours_count.to_f / commits_data.size * 100).round(1),
-              off_hours_percentage: (off_hours_count.to_f / commits_data.size * 100).round(1)
+              off_hours_percentage: (off_hours_count.to_f / commits_data.size * 100).round(1),
             }
           end
 
           def find_busiest_day(commits_data)
             daily_counts = commits_data.group_by { |c| c[:date].strftime('%Y-%m-%d') }
-                                       .transform_values(&:count)
+              .transform_values(&:count)
 
             busiest_date = daily_counts.max_by { |_, count| count }
             return nil unless busiest_date
 
             {
               date: busiest_date[0],
-              commits: busiest_date[1]
+              commits: busiest_date[1],
             }
           end
 
@@ -132,7 +134,7 @@ module DevMetrics
             return 0 if commits_data.empty?
 
             daily_counts = commits_data.group_by { |c| c[:date].strftime('%Y-%m-%d') }
-                                       .transform_values(&:count)
+              .transform_values(&:count)
 
             return 100 if daily_counts.size <= 1
 

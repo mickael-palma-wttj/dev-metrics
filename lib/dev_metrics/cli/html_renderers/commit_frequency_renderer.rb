@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module CLI
     module HtmlRenderers
@@ -8,7 +10,7 @@ module DevMetrics
           [
             render_daily_activity,
             render_hourly_distribution,
-            render_work_pattern
+            render_work_pattern,
           ].compact.join
         end
 
@@ -23,7 +25,7 @@ module DevMetrics
               [
                 metric_detail('Average per day', commits_per_day[:average], 'count'),
                 metric_detail('Max in a day', commits_per_day[:max], 'count'),
-                metric_detail('Total commits', @value[:total_commits], 'count')
+                metric_detail('Total commits', @value[:total_commits], 'count'),
               ].join
             end
           end
@@ -57,7 +59,7 @@ module DevMetrics
                   'Off hours',
                   "#{working_hours[:off_hours_percentage]}% (#{working_hours[:off_hours]} commits)",
                   'percentage'
-                )
+                ),
               ].join
             end
           end

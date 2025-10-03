@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DevMetrics
   module CLI
     module HtmlRenderers
@@ -21,7 +23,7 @@ module DevMetrics
           metric_details do
             @value.map do |key, val|
               metric_detail(
-                DevMetrics::Utils::StringUtils.humanize(key.to_s),
+                Utils::StringUtils.humanize(key.to_s),
                 ValueFormatter.format_generic_value(val)
               )
             end.join

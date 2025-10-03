@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'csv'
 
 module DevMetrics
@@ -34,7 +36,7 @@ module DevMetrics
             result.value,
             result.repository,
             result.success? ? 'success' : 'failed',
-            result.error
+            result.error,
           ]
         end
 
@@ -45,7 +47,7 @@ module DevMetrics
             metric_name,
             ValueFormatter.format_metric_value(metric_result.value),
             metric_result.metadata[:data_points] || 0,
-            data[:metadata][:execution_time] || 0
+            data[:metadata][:execution_time] || 0,
           ]
         end
       end
