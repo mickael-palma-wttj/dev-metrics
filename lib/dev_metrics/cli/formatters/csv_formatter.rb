@@ -45,7 +45,7 @@ module DevMetrics
           [
             data[:metadata][:category],
             metric_name,
-            ValueFormatter.format_metric_value(metric_result.value),
+            Utils::ValueFormatter.format_metric_value(metric_result.value),
             metric_result.metadata[:data_points] || 0,
             data[:metadata][:execution_time] || 0,
           ]

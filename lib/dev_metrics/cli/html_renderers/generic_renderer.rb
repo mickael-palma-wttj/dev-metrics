@@ -24,7 +24,7 @@ module DevMetrics
             @value.map do |key, val|
               metric_detail(
                 Utils::StringUtils.humanize(key.to_s),
-                ValueFormatter.format_generic_value(val)
+                Utils::ValueFormatter.format_generic_value(val)
               )
             end.join
           end
@@ -35,7 +35,7 @@ module DevMetrics
         end
 
         def render_simple_data
-          metric_detail('Value', ValueFormatter.format_generic_value(@value))
+          metric_detail('Value', Utils::ValueFormatter.format_generic_value(@value))
         end
       end
     end

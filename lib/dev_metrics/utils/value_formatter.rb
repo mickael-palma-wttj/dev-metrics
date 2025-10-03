@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DevMetrics
-  module CLI
+  module Utils
     # Value Object for consistent value formatting across all formatters
     class ValueFormatter
       def self.format_metric_value(value)
