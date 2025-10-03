@@ -18,7 +18,7 @@ module DevMetrics
       raw_data = collect_data
       processed_data = process_data(raw_data)
       result = compute_metric(processed_data)
-      
+
       Models::MetricResult.new(
         metric_name: metric_name,
         value: result,
@@ -32,18 +32,18 @@ module DevMetrics
 
     # Abstract methods to be implemented by subclasses
     def metric_name
-      raise NotImplementedError, "Subclasses must implement #metric_name"
+      raise NotImplementedError, 'Subclasses must implement #metric_name'
     end
 
     def description
-      raise NotImplementedError, "Subclasses must implement #description"
+      raise NotImplementedError, 'Subclasses must implement #description'
     end
 
     protected
 
     # Abstract methods for the template method pattern
     def collect_data
-      raise NotImplementedError, "Subclasses must implement #collect_data"
+      raise NotImplementedError, 'Subclasses must implement #collect_data'
     end
 
     def process_data(raw_data)
@@ -52,7 +52,7 @@ module DevMetrics
     end
 
     def compute_metric(processed_data)
-      raise NotImplementedError, "Subclasses must implement #compute_metric"
+      raise NotImplementedError, 'Subclasses must implement #compute_metric'
     end
 
     def build_metadata(processed_data)
@@ -66,8 +66,8 @@ module DevMetrics
     private
 
     def validate_inputs
-      raise ArgumentError, "Repository cannot be nil" if repository.nil?
-      raise ArgumentError, "Time period cannot be nil" if time_period.nil?
+      raise ArgumentError, 'Repository cannot be nil' if repository.nil?
+      raise ArgumentError, 'Time period cannot be nil' if time_period.nil?
     end
 
     def handle_error(error)

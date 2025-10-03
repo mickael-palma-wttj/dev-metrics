@@ -7,7 +7,7 @@ begin
 rescue Interrupt
   puts "\nInterrupted by user"
   exit 1
-rescue => e
+rescue StandardError => e
   puts "Error: #{e.message}"
   exit 1
 end

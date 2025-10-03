@@ -17,7 +17,7 @@ RSpec.describe DevMetrics::Models::MetricResult do
     )
   end
 
-  it_behaves_like "a model with hash conversion"
+  it_behaves_like 'a model with hash conversion'
 
   describe '#initialize' do
     it 'sets all attributes correctly' do

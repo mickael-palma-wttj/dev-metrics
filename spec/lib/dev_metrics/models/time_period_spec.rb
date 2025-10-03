@@ -6,7 +6,7 @@ RSpec.describe DevMetrics::Models::TimePeriod do
 
   subject { described_class.new(start_date, end_date) }
 
-  it_behaves_like "a model with hash conversion"
+  it_behaves_like 'a model with hash conversion'
 
   describe '#initialize' do
     it 'sets start and end dates' do
@@ -129,7 +129,7 @@ RSpec.describe DevMetrics::Models::TimePeriod do
 
   describe '#==' do
     let(:same_period) { described_class.new(start_date, end_date) }
-    let(:different_period) { described_class.new(start_date - 86400, end_date) }
+    let(:different_period) { described_class.new(start_date - 86_400, end_date) }
 
     it 'returns true for same periods' do
       expect(subject).to eq(same_period)

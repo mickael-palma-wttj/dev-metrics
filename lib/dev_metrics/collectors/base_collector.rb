@@ -25,7 +25,7 @@ module DevMetrics
 
       # Abstract methods to be implemented by subclasses
       def validate_repository
-        raise NotImplementedError, "Subclasses must implement #validate_repository"
+        raise NotImplementedError, 'Subclasses must implement #validate_repository'
       end
 
       def setup_collection(time_period)
@@ -33,7 +33,7 @@ module DevMetrics
       end
 
       def perform_collection
-        raise NotImplementedError, "Subclasses must implement #perform_collection"
+        raise NotImplementedError, 'Subclasses must implement #perform_collection'
       end
 
       private

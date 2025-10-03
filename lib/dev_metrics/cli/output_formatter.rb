@@ -5,13 +5,13 @@ module DevMetrics
     # Handles formatting and output of metric results
     class OutputFormatter
       FORMATS = %w[text json csv html].freeze
-      
+
       attr_reader :format, :output_file
 
       def initialize(format = 'text', output_file = nil)
         @format = format.to_s.downcase
         @output_file = output_file
-        
+
         validate_format
       end
 
@@ -42,52 +42,46 @@ module DevMetrics
       private
 
       def validate_format
-        unless FORMATS.include?(format)
-          raise ArgumentError, "Invalid format '#{format}'. Valid formats: #{FORMATS.join(', ')}"
-        end
+        return if FORMATS.include?(format)
+
+        raise ArgumentError, "Invalid format '#{format}'. Valid formats: #{FORMATS.join(', ')}"
       end
 
       def format_text(results, metadata)
         output = []
-        
+
         # Header
-        output << "Developer Metrics Report"
-        output << "=" * 50
-        output << ""
-        
+        output << 'Developer Metrics Report'
+        output << '=' * 50
+        output << ''
+
         # Metadata
-        if metadata[:repository]
-          output << "Repository: #{metadata[:repository]}"
-        end
-        
-        if metadata[:time_period]
-          output << "Time Period: #{metadata[:time_period]}"
-        end
-        
-        if metadata[:generated_at]
-          output << "Generated: #{metadata[:generated_at]}"
-        end
-        
-        output << ""
-        
+        output << "Repository: #{metadata[:repository]}" if metadata[:repository]
+
+        output << "Time Period: #{metadata[:time_period]}" if metadata[:time_period]
+
+        output << "Generated: #{metadata[:generated_at]}" if metadata[:generated_at]
+
+        output << ''
+
         # Results by category
         grouped_results = group_results_by_category(results)
-        
+
         grouped_results.each do |category, category_results|
           output << category.upcase.gsub('_', ' ')
-          output << "-" * 30
-          
+          output << '-' * 30
+
           category_results.each do |result|
-            if result.success?
-              output << "  #{result.metric_name}: #{format_value(result.value)}"
-            else
-              output << "  #{result.metric_name}: ERROR - #{result.error}"
-            end
+            output << if result.success?
+                        "  #{result.metric_name}: #{format_value(result.value)}"
+                      else
+                        "  #{result.metric_name}: ERROR - #{result.error}"
+                      end
           end
-          
-          output << ""
+
+          output << ''
         end
-        
+
         output.join("\n")
       end
 
@@ -101,11 +95,11 @@ module DevMetrics
 
       def format_csv(results, metadata)
         require 'csv'
-        
+
         CSV.generate do |csv|
           # Header
-          csv << ['metric_name', 'value', 'repository', 'status', 'error']
-          
+          csv << %w[metric_name value repository status error]
+
           # Data rows
           results.each do |result|
             csv << [
@@ -121,65 +115,65 @@ module DevMetrics
 
       def format_html(results, metadata)
         html = []
-        html << "<!DOCTYPE html>"
-        html << "<html><head><title>Developer Metrics Report</title>"
-        html << "<style>"
-        html << "body { font-family: Arial, sans-serif; margin: 40px; }"
-        html << "h1 { color: #333; border-bottom: 2px solid #ddd; }"
-        html << "h2 { color: #666; margin-top: 30px; }"
-        html << ".metric { margin: 10px 0; padding: 10px; background: #f5f5f5; }"
-        html << ".success { border-left: 4px solid #4CAF50; }"
-        html << ".error { border-left: 4px solid #f44336; }"
-        html << ".metadata { background: #e3f2fd; padding: 15px; margin-bottom: 20px; }"
-        html << "</style></head><body>"
-        
-        html << "<h1>Developer Metrics Report</h1>"
-        
+        html << '<!DOCTYPE html>'
+        html << '<html><head><title>Developer Metrics Report</title>'
+        html << '<style>'
+        html << 'body { font-family: Arial, sans-serif; margin: 40px; }'
+        html << 'h1 { color: #333; border-bottom: 2px solid #ddd; }'
+        html << 'h2 { color: #666; margin-top: 30px; }'
+        html << '.metric { margin: 10px 0; padding: 10px; background: #f5f5f5; }'
+        html << '.success { border-left: 4px solid #4CAF50; }'
+        html << '.error { border-left: 4px solid #f44336; }'
+        html << '.metadata { background: #e3f2fd; padding: 15px; margin-bottom: 20px; }'
+        html << '</style></head><body>'
+
+        html << '<h1>Developer Metrics Report</h1>'
+
         # Metadata section
         if metadata.any?
           html << "<div class='metadata'>"
-          html << "<h3>Report Information</h3>"
+          html << '<h3>Report Information</h3>'
           metadata.each do |key, value|
             html << "<p><strong>#{key.to_s.capitalize}:</strong> #{value}</p>"
           end
-          html << "</div>"
+          html << '</div>'
         end
-        
+
         # Results by category
         grouped_results = group_results_by_category(results)
-        
+
         grouped_results.each do |category, category_results|
           html << "<h2>#{category.upcase.gsub('_', ' ')}</h2>"
-          
+
           category_results.each do |result|
             css_class = result.success? ? 'metric success' : 'metric error'
             html << "<div class='#{css_class}'>"
             html << "<strong>#{result.metric_name}:</strong> "
-            
-            if result.success?
-              html << format_value(result.value)
-            else
-              html << "ERROR - #{result.error}"
-            end
-            
-            html << "</div>"
+
+            html << if result.success?
+                      format_value(result.value)
+                    else
+                      "ERROR - #{result.error}"
+                    end
+
+            html << '</div>'
           end
         end
-        
-        html << "</body></html>"
+
+        html << '</body></html>'
         html.join("\n")
       end
 
       def group_results_by_category(results)
         # Group results by metric category (inferred from metric name)
         grouped = {}
-        
+
         results.each do |result|
           category = infer_category(result.metric_name)
           grouped[category] ||= []
           grouped[category] << result
         end
-        
+
         grouped
       end
 
