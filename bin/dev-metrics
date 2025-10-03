@@ -3,7 +3,7 @@
 require_relative '../lib/dev_metrics'
 
 begin
-  DevMetrics::Cli::Runner.new(ARGV).run
+  DevMetrics::CLI::Runner.new(ARGV).run
 rescue Interrupt
   puts "\nInterrupted by user"
   exit 1

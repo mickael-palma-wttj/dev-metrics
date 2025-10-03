@@ -1,5 +1,5 @@
 module DevMetrics
-  module Cli
+  module CLI
     # Handles Git repository detection and selection
     class RepositorySelector
       attr_reader :base_path

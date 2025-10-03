@@ -1,7 +1,7 @@
 require 'json'
 
 module DevMetrics
-  module Cli
+  module CLI
     # Handles formatting and output of metric results
     class OutputFormatter
       FORMATS = %w[text json csv html].freeze

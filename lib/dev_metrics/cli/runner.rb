@@ -1,5 +1,5 @@
 module DevMetrics
-  module Cli
+  module CLI
     # Main CLI runner that handles command parsing and orchestrates the application
     class Runner
       COMMANDS = %w[analyze scan report config help].freeze
@@ -146,7 +146,7 @@ module DevMetrics
       def run_scan
         puts "Scanning for repositories in: #{options[:path]}"
         
-        selector = DevMetrics::Cli::RepositorySelector.new(options[:path])
+        selector = DevMetrics::CLI::RepositorySelector.new(options[:path])
         repositories = selector.find_repositories(recursive: options[:recursive])
         
         if repositories.empty?
