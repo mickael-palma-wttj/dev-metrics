@@ -1,3 +1,6 @@
+require 'time'
+require 'date'
+
 module DevMetrics
   # Represents a time period for metric analysis
   # Handles date parsing, validation, and common time range operations
@@ -13,23 +16,23 @@ module DevMetrics
 
     def self.default
       # Default to last 30 days
-      new(30.days_ago, Time.now)
+      new(30, Time.now)
     end
 
     def self.last_week
-      new(1.week_ago, Time.now)
+      new(7, Time.now)
     end
 
     def self.last_month
-      new(1.month_ago, Time.now)
+      new(30, Time.now)
     end
 
     def self.last_quarter
-      new(3.months_ago, Time.now)
+      new(90, Time.now)
     end
 
     def self.last_year
-      new(1.year_ago, Time.now)
+      new(365, Time.now)
     end
 
     def to_h
@@ -101,49 +104,6 @@ module DevMetrics
     # Helper methods for date arithmetic (simple implementations)
     def days_ago(n)
       Time.now - (n * 24 * 60 * 60)
-    end
-
-    def week_ago
-      days_ago(7)
-    end
-
-    def month_ago
-      days_ago(30)
-    end
-
-    def months_ago(n)
-      days_ago(n * 30)
-    end
-
-    def year_ago
-      days_ago(365)
-    end
-
-    # Extend Integer for convenience methods
-    ::Integer.class_eval do
-      def days_ago
-        Time.now - (self * 24 * 60 * 60)
-      end
-
-      def week_ago
-        days_ago if self == 1
-      end
-
-      def weeks_ago
-        Time.now - (self * 7 * 24 * 60 * 60)
-      end
-
-      def month_ago
-        days_ago * 30 if self == 1
-      end
-
-      def months_ago
-        Time.now - (self * 30 * 24 * 60 * 60)
-      end
-
-      def year_ago
-        days_ago * 365 if self == 1
-      end
     end
   end
 end
