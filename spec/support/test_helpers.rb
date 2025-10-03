@@ -21,7 +21,7 @@ module TestHelpers
     end
 
     (@test_repositories ||= []) << repo_path
-    Models::Repository.new(repo_path)
+    DevMetrics::Models::Repository.new(repo_path)
   end
 
   # Creates test commits with specific patterns
@@ -72,13 +72,13 @@ module TestHelpers
 
   # Create test contributors
   def create_test_contributor(name = 'John Doe', email = 'john@example.com')
-    Models::Contributor.new(name, email)
+    DevMetrics::Models::Contributor.new(name, email)
   end
 
   # Create test time period
   def create_test_time_period(days_ago = 30)
     start_date = Time.now - (days_ago * 24 * 60 * 60)
-    Models::TimePeriod.new(start_date, Time.now)
+    DevMetrics::Models::TimePeriod.new(start_date, Time.now)
   end
 end
 

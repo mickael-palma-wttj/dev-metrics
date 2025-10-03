@@ -2,8 +2,8 @@
 
 require 'spec_helper'
 
-RSpec.describe Models::MetricResult do
-  subject do
+RSpec.describe DevMetrics::Models::MetricResult do
+  subject(:metric_result) do
     described_class.new(
       metric_name: metric_name,
       value: value,
@@ -23,24 +23,24 @@ RSpec.describe Models::MetricResult do
 
   describe '#initialize' do
     it 'sets all attributes correctly' do
-      expect(subject.metric_name).to eq(metric_name)
-      expect(subject.value).to eq(value)
-      expect(subject.repository).to eq(repository)
-      expect(subject.time_period).to eq(time_period)
-      expect(subject.metadata).to eq(metadata)
-      expect(subject.error).to be_nil
+      expect(metric_result.metric_name).to eq(metric_name)
+      expect(metric_result.value).to eq(value)
+      expect(metric_result.repository).to eq(repository)
+      expect(metric_result.time_period).to eq(time_period)
+      expect(metric_result.metadata).to eq(metadata)
+      expect(metric_result.error).to be_nil
     end
   end
 
   describe '#success?' do
     context 'when no error' do
       it 'returns true' do
-        expect(subject.success?).to be true
+        expect(metric_result.success?).to be true
       end
     end
 
     context 'when error present' do
-      subject do
+      subject(:error_metric_result) do
         described_class.new(
           metric_name: metric_name,
           value: nil,
@@ -51,14 +51,14 @@ RSpec.describe Models::MetricResult do
       end
 
       it 'returns false' do
-        expect(subject.success?).to be false
+        expect(error_metric_result.success?).to be false
       end
     end
   end
 
   describe '#failed?' do
     it 'returns opposite of success?' do
-      expect(subject.failed?).to eq(!subject.success?)
+      expect(metric_result.failed?).to eq(!subject.success?)
     end
   end
 
