@@ -1,7 +1,3 @@
-require_relative 'models/metric_result'
-require_relative 'models/time_period'
-require_relative 'utils/time_helper'
-
 module DevMetrics
   # Base class for all metric calculations
   # Implements Template Method pattern for consistent metric computation workflow
@@ -23,7 +19,7 @@ module DevMetrics
       processed_data = process_data(raw_data)
       result = compute_metric(processed_data)
       
-      MetricResult.new(
+      Models::MetricResult.new(
         metric_name: metric_name,
         value: result,
         repository: repository.name,
@@ -75,7 +71,7 @@ module DevMetrics
     end
 
     def handle_error(error)
-      MetricResult.new(
+      Models::MetricResult.new(
         metric_name: metric_name,
         value: nil,
         repository: repository&.name || 'unknown',

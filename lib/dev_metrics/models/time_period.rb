@@ -2,9 +2,10 @@ require 'time'
 require 'date'
 
 module DevMetrics
-  # Represents a time period for metric analysis
-  # Handles date parsing, validation, and common time range operations
-  class TimePeriod
+  module Models
+    # Represents a time period for metric analysis
+    # Handles date parsing, validation, and common time range operations
+    class TimePeriod
     attr_reader :start_date, :end_date
 
     def initialize(start_date, end_date = nil)
@@ -104,6 +105,7 @@ module DevMetrics
     # Helper methods for date arithmetic (simple implementations)
     def days_ago(n)
       Time.now - (n * 24 * 60 * 60)
+    end
     end
   end
 end

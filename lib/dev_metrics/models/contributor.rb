@@ -1,6 +1,7 @@
 module DevMetrics
-  # Represents a contributor with identity resolution and metadata
-  class Contributor
+  module Models
+    # Represents a contributor with identity resolution and metadata
+    class Contributor
     attr_reader :name, :email, :aliases
 
     def initialize(name, email = nil, aliases = [])
@@ -62,6 +63,7 @@ module DevMetrics
       return nil if email.nil? || email.strip.empty?
       
       email.strip.downcase
+    end
     end
   end
 end

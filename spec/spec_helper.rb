@@ -1,10 +1,4 @@
-require_relative '../lib/dev_metrics/base_metric'
-require_relative '../lib/dev_metrics/collectors/base_collector'
-require_relative '../lib/dev_metrics/models/metric_result'
-require_relative '../lib/dev_metrics/models/time_period'
-require_relative '../lib/dev_metrics/models/repository'
-require_relative '../lib/dev_metrics/models/contributor'
-require_relative '../lib/dev_metrics/utils/time_helper'
+require_relative '../lib/dev_metrics'
 
 # Load support files
 Dir[File.join(__dir__, 'support', '**', '*.rb')].each { |f| require f }

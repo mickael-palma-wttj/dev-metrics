@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe DevMetrics::TimePeriod do
+RSpec.describe DevMetrics::Models::TimePeriod do
   let(:start_date) { Time.now - (30 * 24 * 60 * 60) }
   let(:end_date) { Time.now }
 

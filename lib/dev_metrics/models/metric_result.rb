@@ -1,7 +1,8 @@
 module DevMetrics
-  # Standardized container for metric calculation results
-  # Provides consistent structure for all metric outputs
-  class MetricResult
+  module Models
+    # Standardized container for metric calculation results
+    # Provides consistent structure for all metric outputs
+    class MetricResult
     attr_reader :metric_name, :value, :repository, :time_period, :metadata, :error
 
     def initialize(metric_name:, value:, repository:, time_period:, metadata: {}, error: nil)
@@ -67,6 +68,7 @@ module DevMetrics
       else
         value.to_s
       end
+    end
     end
   end
 end

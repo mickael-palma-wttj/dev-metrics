@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe DevMetrics::MetricResult do
+RSpec.describe DevMetrics::Models::MetricResult do
   let(:metric_name) { 'test_metric' }
   let(:value) { 42 }
   let(:repository) { 'test-repo' }

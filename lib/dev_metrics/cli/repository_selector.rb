@@ -1,7 +1,5 @@
-require_relative '../models/repository'
-
 module DevMetrics
-  module CLI
+  module Cli
     # Handles Git repository detection and selection
     class RepositorySelector
       attr_reader :base_path
@@ -14,7 +12,7 @@ module DevMetrics
         repositories = []
         
         if git_repository?(base_path)
-          repositories << Repository.new(base_path)
+          repositories << DevMetrics::Models::Repository.new(base_path)
         end
         
         if recursive
@@ -63,7 +61,7 @@ module DevMetrics
           next if nested_in_git_repo?(dir)
           
           begin
-            repositories << Repository.new(dir)
+            repositories << DevMetrics::Models::Repository.new(dir)
           rescue ArgumentError
             # Skip invalid repositories
           end

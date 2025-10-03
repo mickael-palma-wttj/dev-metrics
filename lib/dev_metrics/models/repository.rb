@@ -1,6 +1,7 @@
 module DevMetrics
-  # Represents a Git repository with metadata and validation
-  class Repository
+  module Models
+    # Represents a Git repository with metadata and validation
+    class Repository
     attr_reader :path, :name, :remote_url
 
     def initialize(path)
@@ -79,6 +80,7 @@ module DevMetrics
       match[1].strip if match
     rescue StandardError
       nil
+    end
     end
   end
 end

@@ -1,10 +1,5 @@
-require_relative '../models/repository'
-require_relative '../models/time_period'
-require_relative 'repository_selector'
-require_relative 'output_formatter'
-
 module DevMetrics
-  module CLI
+  module Cli
     # Main CLI runner that handles command parsing and orchestrates the application
     class Runner
       COMMANDS = %w[analyze scan report config help].freeze
@@ -129,7 +124,7 @@ module DevMetrics
         puts "Analyzing repository at: #{options[:path]}"
         
         begin
-          repository = Repository.new(options[:path])
+          repository = DevMetrics::Models::Repository.new(options[:path])
           time_period = build_time_period
           
           puts "Repository: #{repository.name}"
@@ -151,7 +146,7 @@ module DevMetrics
       def run_scan
         puts "Scanning for repositories in: #{options[:path]}"
         
-        selector = RepositorySelector.new(options[:path])
+        selector = DevMetrics::Cli::RepositorySelector.new(options[:path])
         repositories = selector.find_repositories(recursive: options[:recursive])
         
         if repositories.empty?
@@ -183,9 +178,9 @@ module DevMetrics
         if options[:since] || options[:until]
           start_date = options[:since] ? Time.parse(options[:since]) : 30
           end_date = options[:until] ? Time.parse(options[:until]) : Time.now
-          TimePeriod.new(start_date, end_date)
+          DevMetrics::Models::TimePeriod.new(start_date, end_date)
         else
-          TimePeriod.default
+          DevMetrics::Models::TimePeriod.default
         end
       end
 
