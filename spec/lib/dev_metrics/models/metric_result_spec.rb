@@ -76,7 +76,7 @@ RSpec.describe DevMetrics::Models::MetricResult do
 
   describe '#to_json' do
     it 'returns valid JSON' do
-      json_string = subject.to_json
+      json_string = metric_result.to_json
       expect { JSON.parse(json_string) }.not_to raise_error
     end
   end
@@ -92,7 +92,7 @@ RSpec.describe DevMetrics::Models::MetricResult do
     end
 
     it 'returns true for equivalent results' do
-      expect(subject).to eq(other)
+      expect(metric_result).to eq(other)
     end
 
     it 'returns false for different metric names' do
@@ -102,21 +102,21 @@ RSpec.describe DevMetrics::Models::MetricResult do
         repository: repository,
         time_period: time_period
       )
-      expect(subject).not_to eq(other)
+      expect(metric_result).not_to eq(other)
     end
   end
 
   describe '#to_s' do
     context 'when successful' do
       it 'formats value and repository' do
-        expect(subject.to_s).to include(metric_name)
-        expect(subject.to_s).to include(value.to_s)
-        expect(subject.to_s).to include(repository)
+        expect(metric_result.to_s).to include(metric_name)
+        expect(metric_result.to_s).to include(value.to_s)
+        expect(metric_result.to_s).to include(repository)
       end
     end
 
     context 'when failed' do
-      subject do
+      subject(:error_metric_result) do
         described_class.new(
           metric_name: metric_name,
           value: nil,
@@ -127,8 +127,8 @@ RSpec.describe DevMetrics::Models::MetricResult do
       end
 
       it 'shows error message' do
-        expect(subject.to_s).to include('ERROR')
-        expect(subject.to_s).to include('Test error')
+        expect(error_metric_result.to_s).to include('ERROR')
+        expect(error_metric_result.to_s).to include('Test error')
       end
     end
   end
