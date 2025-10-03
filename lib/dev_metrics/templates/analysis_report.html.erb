@@ -161,7 +161,7 @@
         <% metrics.each do |metric_name, data| %>
         <% metric_result = data[:metric] %>
         <div class="metric">
-            <div class="metric-name"><%= metric_name.to_s.gsub('_', ' ').titleize %></div>
+            <div class="metric-name"><%= string_utils.titleize(metric_name.to_s) %></div>
             
             <!-- Basic Info -->
             <div class="metric-details">
@@ -169,7 +169,7 @@
                     <strong>Status:</strong> <span class="success">✅ Success</span>
                 </div>
                 <div class="metric-detail">
-                    <strong>Category:</strong> <%= data[:category].to_s.titleize %>
+                    <strong>Category:</strong> <%= string_utils.titleize(data[:category].to_s) %>
                 </div>
                 <div class="metric-detail">
                     <strong>Data Points:</strong> <%= metric_result.metadata[:data_points] || 0 %> <%= metric_result.metadata[:data_points_label] || 'records' %>

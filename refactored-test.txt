@@ -1,0 +1,126 @@
+Git Metrics Analysis Report
+==================================================
+
+
+Repository: dev-metrics-new
+Path: /Users/mickael.palma-ext/dev/personal/dev-metrics-new
+Analyzed: 2025-10-03T17:23:09+01:00
+
+
+
+Total Metrics: 13
+Execution Time: 611ms
+Data Coverage: 100.0%
+
+
+
+COMMIT ACTIVITY
+----------------------------------------
+
+
+  commits_per_developer:
+    Status: ✅ Success
+    Data Points: 1 records
+    Value: 1 categories
+
+
+
+  commit_size:
+    Status: ✅ Success
+    Data Points: 11 records
+    Value: 10 categories
+
+
+
+  commit_frequency:
+    Status: ✅ Success
+    Data Points: 11 commits
+    Value: 8 categories
+
+
+
+  lines_changed:
+    Status: ✅ Success
+    Data Points: 11 records
+    Value: 1 categories
+
+
+
+
+CODE CHURN
+----------------------------------------
+
+
+  file_churn:
+    Status: ✅ Success
+    Data Points: 11 records
+    Value: 61 categories
+
+
+
+  authors_per_file:
+    Status: ✅ Success
+    Data Points: 11 records
+    Value: 61 categories
+
+
+
+  file_ownership:
+    Status: ✅ Success
+    Data Points: 11 records
+    Value: 61 categories
+
+
+
+  co_change_pairs:
+    Status: ✅ Success
+    Data Points: 11 records
+    Value: 753 categories
+
+
+
+
+RELIABILITY
+----------------------------------------
+
+
+  revert_rate:
+    Status: ✅ Success
+    Data Points: 11 records
+    Value: 4 categories
+
+
+
+  bugfix_ratio:
+    Status: ✅ Success
+    Data Points: 11 records
+    Value: 4 categories
+
+
+
+  large_commits:
+    Status: ✅ Success
+    Data Points: 11 commits
+    Value: 6 categories
+
+
+
+
+FLOW
+----------------------------------------
+
+
+  lead_time:
+    Status: ✅ Success
+    Data Points: 2 records
+    Value: 6 categories
+
+
+
+  deployment_frequency:
+    Status: ✅ Success
+    Data Points: 3 deployments
+    Value: 6 categories
+
+
+
