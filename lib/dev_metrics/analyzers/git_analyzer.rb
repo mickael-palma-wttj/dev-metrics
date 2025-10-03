@@ -14,13 +14,11 @@ module DevMetrics
 
       def analyze(metric_names = 'all', categories = nil)
         metrics_to_run = Metrics::GitMetricsRegistry.filter_metrics(metric_names, categories)
-        
-        if metrics_to_run.empty?
-          raise ArgumentError, 'No valid metrics specified for analysis'
-        end
+
+        raise ArgumentError, 'No valid metrics specified for analysis' if metrics_to_run.empty?
 
         puts "Analyzing #{metrics_to_run.size} Git metrics..." unless options[:no_progress]
-        
+
         @results = {}
         errors = {}
 
@@ -29,10 +27,10 @@ module DevMetrics
 
           begin
             progress_update(metric_name, index, metrics_to_run.size) unless options[:no_progress]
-            
+
             metric = create_metric(metric_name)
             result = metric.calculate
-            
+
             @results[metric_name] = {
               metric: result,
               metadata: {
@@ -51,7 +49,7 @@ module DevMetrics
         end
 
         handle_analysis_errors(errors) unless errors.empty?
-        
+
         puts "Analysis complete! Processed #{@results.size} metrics" unless options[:no_progress]
         @results
       end
@@ -60,7 +58,7 @@ module DevMetrics
         return {} if @results.empty?
 
         categories = @results.group_by { |_, data| data[:metadata][:category] }
-        
+
         {
           total_metrics: @results.size,
           categories: categories.transform_values { |metrics| metrics.size },
@@ -87,21 +85,17 @@ module DevMetrics
       def should_run_metric?(metric_name)
         # Skip metrics based on options
         return false if options[:exclude_metrics]&.include?(metric_name.to_s)
-        
+
         # Skip if contributors filter doesn't match
-        if options[:contributors] && !options[:contributors].empty?
-          return has_contributor_data?(metric_name)
-        end
+        return has_contributor_data?(metric_name) if options[:contributors] && !options[:contributors].empty?
 
         true
       end
 
       def create_metric(metric_name)
         metric = Metrics::GitMetricsRegistry.create_metric(metric_name, repository, metric_options)
-        
-        unless metric
-          raise ArgumentError, "Unknown metric: #{metric_name}"
-        end
+
+        raise ArgumentError, "Unknown metric: #{metric_name}" unless metric
 
         metric
       end
@@ -132,7 +126,7 @@ module DevMetrics
           # Relative time format (30d, 2w, 1m, 1y)
           number = time_option.to_i
           unit = time_option[-1]
-          
+
           case unit
           when 'd' then Time.now - (number * 24 * 60 * 60)
           when 'w' then Time.now - (number * 7 * 24 * 60 * 60)
@@ -168,7 +162,7 @@ module DevMetrics
         errors.each do |metric_name, error_info|
           puts "  - #{metric_name}: #{error_info[:message]}"
         end
-        puts ""
+        puts ''
       end
 
       def total_execution_time

@@ -109,12 +109,12 @@ module DevMetrics
 
           def identify_main_branch_merges(commits_data, branches_data)
             main_branch_names = %w[main master production prod]
-            
+
             # branches_data is an array of strings, not hashes with :current key
             # Look for main branch patterns in the branch names
-            current_branch = branches_data.find { |branch| 
+            current_branch = branches_data.find do |branch|
               main_branch_names.any? { |main_name| branch.include?(main_name) }
-            } || 'main'
+            end || 'main'
 
             # Include current branch if it looks like a main branch
             main_branch_names << current_branch unless main_branch_names.include?(current_branch)

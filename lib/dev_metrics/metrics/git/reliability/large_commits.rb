@@ -25,18 +25,18 @@ module DevMetrics
             # Calculate commit sizes and categorize
             commit_sizes = calculate_commit_sizes(commits_data)
             categorized_commits = categorize_by_size(commits_data, commit_sizes)
-            
+
             # Analyze by author
             author_stats = calculate_author_large_commit_stats(commits_data, commit_sizes)
-            
+
             # Calculate thresholds
             thresholds = calculate_size_thresholds(commit_sizes)
-            
+
             # Overall statistics
             total_commits = commits_data.size
             large_commits = categorized_commits[:large].size
             huge_commits = categorized_commits[:huge].size
-            
+
             {
               overall: {
                 total_commits: total_commits,
@@ -57,10 +57,10 @@ module DevMetrics
 
           def build_metadata(commits_data)
             return super if commits_data.empty?
-            
+
             result = compute_metric(commits_data)
             overall = result[:overall]
-            
+
             super.merge(
               large_commit_ratio: overall[:large_commit_ratio],
               risk_score: overall[:risk_score],
@@ -79,20 +79,20 @@ module DevMetrics
               additions = commit[:additions] || 0
               deletions = commit[:deletions] || 0
               files_changed = commit[:files_changed]&.size || 0
-              
+
               # Weighted size calculation
               line_changes = additions + deletions
               file_weight = files_changed * 10 # Files changed have additional weight
-              
+
               line_changes + file_weight
             end
           end
 
           def calculate_size_thresholds(commit_sizes)
             return { small: 50, medium: 200, large: 500, huge: 1000 } if commit_sizes.empty?
-            
+
             sorted_sizes = commit_sizes.sort
-            
+
             # Statistical thresholds based on percentiles
             {
               small: calculate_percentile(sorted_sizes, 25),
@@ -104,42 +104,42 @@ module DevMetrics
 
           def categorize_by_size(commits_data, commit_sizes)
             thresholds = calculate_size_thresholds(commit_sizes)
-            
+
             categories = {
               small: [],
               medium: [],
               large: [],
               huge: []
             }
-            
+
             commits_data.each_with_index do |commit, index|
               size = commit_sizes[index]
-              
+
               category = case size
-              when 0..thresholds[:small]
-                :small
-              when thresholds[:small]..thresholds[:medium]
-                :medium  
-              when thresholds[:medium]..thresholds[:large]
-                :large
-              else
-                :huge
-              end
-              
+                         when 0..thresholds[:small]
+                           :small
+                         when thresholds[:small]..thresholds[:medium]
+                           :medium
+                         when thresholds[:medium]..thresholds[:large]
+                           :large
+                         else
+                           :huge
+                         end
+
               # Add size info to commit
               commit_with_size = commit.merge(
                 calculated_size: size,
                 size_category: category
               )
-              
+
               categories[category] << commit_with_size
             end
-            
+
             # Sort each category by size (largest first)
             categories.each do |category, commits|
               categories[category] = commits.sort_by { |c| -c[:calculated_size] }
             end
-            
+
             categories
           end
 
@@ -155,16 +155,16 @@ module DevMetrics
                 risk_score: 0.0
               }
             end
-            
+
             thresholds = calculate_size_thresholds(commit_sizes)
-            
+
             commits_data.each_with_index do |commit, index|
               author = commit[:author] || commit[:author_name]
               size = commit_sizes[index]
-              
+
               stats[author][:total_commits] += 1
               stats[author][:max_commit_size] = [stats[author][:max_commit_size], size].max
-              
+
               if size >= thresholds[:huge]
                 stats[author][:huge_commits] += 1
                 stats[author][:large_commits] += 1
@@ -172,25 +172,28 @@ module DevMetrics
                 stats[author][:large_commits] += 1
               end
             end
-            
+
             # Calculate derived metrics
             stats.each do |author, data|
               author_commits = commits_data.select { |c| (c[:author] || c[:author_name]) == author }
-              author_sizes = author_commits.map.with_index { |_, i| commit_sizes[commits_data.index(author_commits[i])] }
-              
+              author_sizes = author_commits.map.with_index do |_, i|
+                commit_sizes[commits_data.index(author_commits[i])]
+              end
+
               data[:avg_commit_size] = author_sizes.empty? ? 0 : (author_sizes.sum.to_f / author_sizes.size).round(1)
               data[:large_commit_ratio] = calculate_ratio(data[:large_commits], data[:total_commits])
-              data[:risk_score] = calculate_author_risk_score(data[:large_commits], data[:huge_commits], data[:total_commits])
+              data[:risk_score] =
+                calculate_author_risk_score(data[:large_commits], data[:huge_commits], data[:total_commits])
             end
-            
+
             stats.sort_by { |_, data| -data[:risk_score] }.to_h
           end
 
           def analyze_size_distribution(commit_sizes)
             return {} if commit_sizes.empty?
-            
+
             sorted_sizes = commit_sizes.sort
-            
+
             {
               min: sorted_sizes.first,
               max: sorted_sizes.last,
@@ -206,18 +209,18 @@ module DevMetrics
           def identify_risk_patterns(commits_data, commit_sizes)
             thresholds = calculate_size_thresholds(commit_sizes)
             large_commits = []
-            
+
             commits_data.each_with_index do |commit, index|
               size = commit_sizes[index]
               next unless size >= thresholds[:large]
-              
+
               large_commits << {
                 commit: commit,
                 size: size,
                 risk_factors: analyze_commit_risk_factors(commit, size, thresholds)
               }
             end
-            
+
             {
               risky_commits: large_commits.sort_by { |c| -c[:size] }.first(20),
               common_risk_factors: aggregate_risk_factors(large_commits),
@@ -227,54 +230,54 @@ module DevMetrics
 
           def analyze_commit_risk_factors(commit, size, thresholds)
             risk_factors = []
-            
+
             # Size-based risks
             risk_factors << 'HUGE_SIZE' if size >= thresholds[:huge]
             risk_factors << 'LARGE_SIZE' if size >= thresholds[:large]
-            
+
             # File count risks
             files_count = commit[:files_changed]&.size || 0
             risk_factors << 'MANY_FILES' if files_count > 20
             risk_factors << 'EXCESSIVE_FILES' if files_count > 50
-            
+
             # Message-based risks
             message = (commit[:message] || commit[:subject] || '').downcase
             risk_factors << 'MERGE_COMMIT' if message.include?('merge')
             risk_factors << 'VAGUE_MESSAGE' if message.length < 10
             risk_factors << 'MULTIPLE_CONCERNS' if message.include?('and') && message.scan(/\band\b/).size > 1
-            
+
             # Time-based risks
             time = commit[:date]
             risk_factors << 'OFF_HOURS' if time.hour < 9 || time.hour > 18
             risk_factors << 'WEEKEND' if time.saturday? || time.sunday?
-            
+
             risk_factors
           end
 
           def aggregate_risk_factors(large_commits)
             factor_counts = Hash.new(0)
-            
+
             large_commits.each do |commit_data|
               commit_data[:risk_factors].each do |factor|
                 factor_counts[factor] += 1
               end
             end
-            
+
             factor_counts.sort_by { |_, count| -count }.to_h
           end
 
           def analyze_large_commit_timing(large_commits)
             return {} if large_commits.empty?
-            
+
             by_hour = Hash.new(0)
             by_day = Hash.new(0)
-            
+
             large_commits.each do |commit_data|
               time = commit_data[:commit][:date]
               by_hour[time.hour] += 1
               by_day[time.strftime('%A')] += 1
             end
-            
+
             {
               by_hour_of_day: by_hour,
               by_day_of_week: by_day,
@@ -285,40 +288,41 @@ module DevMetrics
 
           def calculate_percentile(sorted_array, percentile)
             return 0 if sorted_array.empty?
-            
+
             index = (percentile / 100.0 * (sorted_array.length - 1)).round
             sorted_array[index]
           end
 
           def calculate_standard_deviation(values)
             return 0 if values.empty?
-            
+
             mean = values.sum.to_f / values.size
-            variance = values.sum { |v| (v - mean) ** 2 } / values.size
+            variance = values.sum { |v| (v - mean)**2 } / values.size
             Math.sqrt(variance).round(2)
           end
 
           def calculate_ratio(count, total)
             return 0.0 if total == 0
+
             (count.to_f / total * 100).round(2)
           end
 
           def calculate_risk_score(large_commits, huge_commits, total_commits)
             return 0.0 if total_commits == 0
-            
+
             # Weighted risk: huge commits are more risky than large ones
             risk_points = (large_commits * 1) + (huge_commits * 3)
             max_risk_points = total_commits * 3
-            
+
             (risk_points.to_f / max_risk_points * 100).round(2)
           end
 
           def calculate_author_risk_score(large_commits, huge_commits, total_commits)
             return 0.0 if total_commits == 0
-            
+
             risk_points = (large_commits * 1) + (huge_commits * 3)
             max_risk_points = total_commits * 3
-            
+
             (risk_points.to_f / max_risk_points * 100).round(2)
           end
 
@@ -328,6 +332,7 @@ module DevMetrics
 
           def find_largest_commit_author(author_stats)
             return nil if author_stats.empty?
+
             author_stats.max_by { |_, stats| stats[:max_commit_size] }&.first
           end
 

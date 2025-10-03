@@ -24,16 +24,16 @@ module DevMetrics
 
             # Categorize commits
             categorized_commits = categorize_commits(commits_data)
-            
+
             # Calculate ratios by author
             author_stats = calculate_author_bugfix_stats(commits_data, categorized_commits)
-            
+
             # Calculate overall metrics
             total_commits = commits_data.size
             bugfix_commits = categorized_commits[:bugfix].size
             feature_commits = categorized_commits[:feature].size
             maintenance_commits = categorized_commits[:maintenance].size
-            
+
             {
               overall: {
                 total_commits: total_commits,
@@ -57,10 +57,10 @@ module DevMetrics
 
           def build_metadata(commits_data)
             return super if commits_data.empty?
-            
+
             result = compute_metric(commits_data)
             overall = result[:overall]
-            
+
             super.merge(
               bugfix_ratio: overall[:bugfix_ratio],
               quality_score: overall[:quality_score],
@@ -79,13 +79,13 @@ module DevMetrics
               maintenance: [],
               other: []
             }
-            
+
             commits_data.each do |commit|
               message = commit[:message].downcase.strip
               category = classify_commit_message(message)
               categories[category] << commit
             end
-            
+
             categories
           end
 
@@ -103,7 +103,7 @@ module DevMetrics
               /\brepair/,
               /\bhandle\s+(error|exception)/
             ]
-            
+
             # Feature patterns
             feature_patterns = [
               /^feat\b/,
@@ -117,7 +117,7 @@ module DevMetrics
               /\bupgrade/,
               /\bextend/
             ]
-            
+
             # Maintenance patterns
             maintenance_patterns = [
               /^refactor/,
@@ -137,11 +137,11 @@ module DevMetrics
               /\bmove\s/,
               /\brename/
             ]
-            
+
             return :bugfix if bugfix_patterns.any? { |pattern| message.match?(pattern) }
             return :feature if feature_patterns.any? { |pattern| message.match?(pattern) }
             return :maintenance if maintenance_patterns.any? { |pattern| message.match?(pattern) }
-            
+
             :other
           end
 
@@ -157,13 +157,13 @@ module DevMetrics
                 quality_score: 1.0
               }
             end
-            
+
             # Count commits by author and category
             commits_data.each do |commit|
               author = commit[:author]
               stats[author][:total_commits] += 1
             end
-            
+
             categorized_commits.each do |category, commits|
               commits.each do |commit|
                 author = commit[:author]
@@ -177,34 +177,34 @@ module DevMetrics
                 end
               end
             end
-            
+
             # Calculate ratios and scores
             stats.each do |author, data|
               total = data[:total_commits]
               next if total == 0
-              
+
               data[:bugfix_ratio] = calculate_ratio(data[:bugfix_commits], total)
               data[:feature_ratio] = calculate_ratio(data[:feature_commits], total)
               data[:quality_score] = calculate_quality_score(data[:bugfix_commits], data[:feature_commits])
             end
-            
+
             stats.sort_by { |_, data| -data[:bugfix_ratio] }.to_h
           end
 
           def analyze_bugfix_patterns(bugfix_commits)
             return {} if bugfix_commits.empty?
-            
+
             by_hour = Hash.new(0)
             by_day = Hash.new(0)
             by_month = Hash.new(0)
-            
+
             bugfix_commits.each do |commit|
               time = commit[:date]
               by_hour[time.hour] += 1
               by_day[time.strftime('%A')] += 1
               by_month[time.strftime('%Y-%m')] += 1
             end
-            
+
             {
               by_hour_of_day: by_hour,
               by_day_of_week: by_day,
@@ -218,22 +218,22 @@ module DevMetrics
           def identify_urgency_patterns(bugfix_commits)
             urgent_keywords = %w[urgent critical hotfix emergency immediate asap]
             severity_keywords = %w[critical major minor trivial blocker]
-            
+
             urgency_counts = Hash.new(0)
             severity_counts = Hash.new(0)
-            
+
             bugfix_commits.each do |commit|
               message = commit[:message].downcase
-              
+
               urgent_keywords.each do |keyword|
                 urgency_counts[keyword] += 1 if message.include?(keyword)
               end
-              
+
               severity_keywords.each do |keyword|
                 severity_counts[keyword] += 1 if message.include?(keyword)
               end
             end
-            
+
             {
               urgency_keywords: urgency_counts,
               severity_keywords: severity_counts,
@@ -244,13 +244,14 @@ module DevMetrics
 
           def calculate_ratio(count, total)
             return 0.0 if total == 0
+
             (count.to_f / total * 100).round(2)
           end
 
           def calculate_quality_score(bugfix_commits, feature_commits)
             total_productive = bugfix_commits + feature_commits
             return 1.0 if total_productive == 0
-            
+
             # Higher feature ratio = higher quality score
             feature_ratio = feature_commits.to_f / total_productive
             [feature_ratio, 0.0].max.round(3)
@@ -262,25 +263,26 @@ module DevMetrics
 
           def find_most_reliable_author(author_stats)
             return nil if author_stats.empty?
+
             author_stats.max_by { |_, stats| stats[:quality_score] }&.first
           end
 
           def calculate_bugfix_trend(time_patterns)
             return 0 if time_patterns.empty? || !time_patterns[:by_month]
-            
+
             monthly_data = time_patterns[:by_month]
             return 0 if monthly_data.size < 2
-            
+
             # Calculate simple trend (positive = increasing bugfixes)
             months = monthly_data.keys.sort
             first_half = months.first(months.size / 2)
             second_half = months.last(months.size / 2)
-            
+
             first_avg = first_half.sum { |month| monthly_data[month] } / first_half.size.to_f
             second_avg = second_half.sum { |month| monthly_data[month] } / second_half.size.to_f
-            
+
             return 0 if first_avg == 0
-            
+
             ((second_avg - first_avg) / first_avg * 100).round(1)
           end
         end
