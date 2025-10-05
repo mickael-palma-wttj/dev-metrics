@@ -4,7 +4,7 @@ require 'json'
 
 module DevMetrics
   module CLI
-    # Handles formatting and output of metric results using Strategy pattern
+    # Handles formatting and output of analysis results using Strategy pattern
     class OutputFormatter
       FORMATTERS = {
         'text' => Formatters::TextFormatter,
@@ -22,10 +22,6 @@ module DevMetrics
         @template_renderer = Utils::TemplateRenderer.new
 
         validate_format
-      end
-
-      def format_results(results, metadata = {})
-        formatter.format_results(results, metadata)
       end
 
       def format_analysis_results(results, summary = {})

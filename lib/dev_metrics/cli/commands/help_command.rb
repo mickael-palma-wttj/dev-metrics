@@ -21,7 +21,6 @@ module DevMetrics
             COMMANDS:
               analyze [path]     Analyze repositories (single or multiple with --recursive/--interactive)
               scan [path]        Legacy alias for analyze (deprecated)
-              report             Generate detailed reports
               config             Manage configuration
               help               Show this help message
 

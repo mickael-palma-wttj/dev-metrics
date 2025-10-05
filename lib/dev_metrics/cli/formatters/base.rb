@@ -10,10 +10,6 @@ module DevMetrics
           @template_renderer = template_renderer
         end
 
-        def format_results(results, metadata)
-          raise NotImplementedError, 'Subclasses must implement format_results'
-        end
-
         def format_analysis_results(results, summary)
           raise NotImplementedError, 'Subclasses must implement format_analysis_results'
         end

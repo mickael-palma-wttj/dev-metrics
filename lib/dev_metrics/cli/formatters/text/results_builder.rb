@@ -6,29 +6,12 @@ module DevMetrics
       module Text
         # Builder for results sections with extracted formatting logic
         class ResultsBuilder
-          def self.build_basic(results)
-            new(results).build_basic
-          end
-
           def self.build_analysis(results)
             new(results).build_analysis
           end
 
           def initialize(results)
             @results = results
-          end
-
-          def build_basic
-            output = []
-            grouped_results = Services::ResultGrouper.new(results).group_by_category
-
-            grouped_results.each do |category, category_results|
-              add_category_header(output, category, 30)
-              add_basic_results(output, category_results)
-              add_blank_line(output)
-            end
-
-            output
           end
 
           def build_analysis
@@ -53,23 +36,9 @@ module DevMetrics
             output << ('-' * separator_length)
           end
 
-          def add_basic_results(output, category_results)
-            category_results.each do |result|
-              output << format_result_line(result)
-            end
-          end
-
           def add_analysis_metrics(output, metrics)
             metrics.each do |metric_name, data|
               output.concat(format_analysis_metric(metric_name, data))
-            end
-          end
-
-          def format_result_line(result)
-            if result.success?
-              "  #{result.metric_name}: #{Utils::ValueFormatter.format_generic_value(result.value)}"
-            else
-              "  #{result.metric_name}: ERROR - #{result.error}"
             end
           end
 

@@ -4,15 +4,8 @@ module DevMetrics
   module CLI
     module Formatters
       # Refactored TextFormatter following Sandi Metz rules and SOLID principles
-      # Uses Strategy pattern for different report types
+      # Uses Strategy pattern for analysis reports
       class TextFormatter < Base
-        def format_results(results, metadata)
-          template_name = 'basic_report.text'
-          render_template_or_fallback(template_name, { results: results, metadata: metadata }) do
-            basic_report_strategy(results, metadata).build({})
-          end
-        end
-
         def format_analysis_results(results, summary)
           processed_summary = DevMetrics::Services::ContributorFilterProcessor.process(summary)
           template_name = 'analysis_report.text'
@@ -24,11 +17,7 @@ module DevMetrics
 
         private
 
-        # Factory methods for creating strategies
-        def basic_report_strategy(results, metadata)
-          Text::BasicReportStrategy.new(results, metadata)
-        end
-
+        # Factory method for creating analysis strategy
         def analysis_report_strategy(results, summary)
           Text::AnalysisReportStrategy.new(results, summary)
         end

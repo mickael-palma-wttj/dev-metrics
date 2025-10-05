@@ -7,7 +7,6 @@ module DevMetrics
       COMMAND_MAPPING = {
         'analyze' => Commands::AnalyzeCommand,
         'scan' => Commands::ScanCommand,
-        'report' => Commands::ReportCommand,
         'config' => Commands::ConfigCommand,
         'help' => Commands::HelpCommand,
         nil => Commands::HelpCommand,

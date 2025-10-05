@@ -6,17 +6,10 @@ module DevMetrics
       # Refactored HtmlFormatter following Sandi Metz rules and SOLID principles
       # Uses composition with specialized builder classes
       class HtmlFormatter < Base
-        def format_results(results, metadata)
-          template_name = 'basic_report.html'
-          render_template_or_fallback(template_name, { results: results, metadata: metadata }) do
-            format_html_fallback(results, metadata)
-          end
-        end
-
         def format_analysis_results(results, summary)
           template_name = 'analysis_report.html'
           render_template_or_fallback(template_name, { results: results, summary: summary }) do
-            format_results([], summary.merge(results: results))
+            format_html_fallback(results, summary)
           end
         end
 
@@ -59,14 +52,14 @@ module DevMetrics
 
         private
 
-        def format_html_fallback(results, metadata)
-          body_content = build_html_body(results, metadata)
+        def format_html_fallback(results, summary)
+          body_content = build_html_body(results, summary)
           HTML::DocumentBuilder.build_document(body_content)
         end
 
-        def build_html_body(results, metadata)
+        def build_html_body(results, summary)
           html = []
-          html.concat(HTML::MetadataBuilder.build_metadata_section(metadata))
+          html.concat(HTML::MetadataBuilder.build_metadata_section(summary))
           html.concat(HTML::ResultsBuilder.build_results_sections(results))
           html
         end

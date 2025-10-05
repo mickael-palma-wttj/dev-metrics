@@ -4,14 +4,6 @@ module DevMetrics
   module CLI
     module Formatters
       class JsonFormatter < Base
-        def format_results(results, metadata)
-          {
-            metadata: metadata,
-            results: results.map(&:to_h),
-            summary: Services::SummaryGenerator.generate(results),
-          }.to_json
-        end
-
         def format_analysis_results(results, summary)
           {
             summary: summary,
