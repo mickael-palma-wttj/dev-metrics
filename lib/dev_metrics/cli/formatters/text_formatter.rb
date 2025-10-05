@@ -14,7 +14,7 @@ module DevMetrics
         end
 
         def format_analysis_results(results, summary)
-          processed_summary = Services::ContributorFilterProcessor.process(summary)
+          processed_summary = DevMetrics::Services::ContributorFilterProcessor.process(summary)
           template_name = 'analysis_report.text'
 
           render_template_or_fallback(template_name, { results: results, summary: processed_summary }) do

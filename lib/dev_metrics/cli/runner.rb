@@ -19,10 +19,10 @@ module DevMetrics
       private
 
       def parse_and_validate_options
-        parser = Services::CliOptionParser.new(args)
+        parser = DevMetrics::Services::CliOptionParser.new(args)
         options = parser.parse
 
-        Services::CliValidator.new(options).validate!
+        DevMetrics::Services::CliValidator.new(options).validate!
         options
       end
 

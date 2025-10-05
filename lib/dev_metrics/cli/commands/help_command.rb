@@ -19,8 +19,8 @@ module DevMetrics
               dev-metrics <command> [path] [options]
 
             COMMANDS:
-              analyze [path]     Analyze a single repository (default)
-              scan [path]        Scan for multiple repositories
+              analyze [path]     Analyze repositories (single or multiple with --recursive/--interactive)
+              scan [path]        Legacy alias for analyze (deprecated)
               report             Generate detailed reports
               config             Manage configuration
               help               Show this help message
@@ -43,11 +43,11 @@ module DevMetrics
               --no-progress      Disable progress indicators
 
             EXAMPLES:
-              dev-metrics analyze .
-              dev-metrics analyze /path/to/repo --format=json --output=metrics.json
-              dev-metrics analyze . --all-time --format=text
-              dev-metrics scan /workspace --interactive --analyze
-              dev-metrics scan /workspace --recursive --analyze --all-time
+              dev-metrics analyze .                                    # Single repository
+              dev-metrics analyze /workspace --recursive               # All repositories in workspace
+              dev-metrics analyze /workspace --interactive             # Interactive repository selection
+              dev-metrics analyze . --all-time --format=json          # Single repo, all-time, JSON format
+              dev-metrics analyze /workspace --recursive --all-time    # All repos, complete history
               dev-metrics analyze . --since=2024-01-01 --contributors=john.doe
 
             For more information, visit: https://github.com/your-username/dev-metrics-new

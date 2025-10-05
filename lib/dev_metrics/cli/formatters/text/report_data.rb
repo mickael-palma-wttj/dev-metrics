@@ -25,7 +25,7 @@ module DevMetrics
           def processed_summary
             return {} unless analysis_report?
 
-            Services::ContributorFilterProcessor.process(summary)
+            DevMetrics::Services::ContributorFilterProcessor.process(summary)
           end
 
           def repository_info
