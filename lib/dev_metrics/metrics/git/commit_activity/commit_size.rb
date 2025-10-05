@@ -5,6 +5,7 @@ module DevMetrics
     module Git
       module CommitActivity
         # Analyzes commit size based on lines added and deleted
+        # Refactored to follow SOLID principles and use service objects
         class CommitSize < BaseMetric
           def metric_name
             'commit_size'
@@ -22,63 +23,79 @@ module DevMetrics
           end
 
           def compute_metric(commits_data)
-            return {} if commits_data.empty?
+            return build_empty_result if commits_data.empty?
 
-            sizes = commits_data.map { |commit| commit[:additions] + commit[:deletions] }
-
-            {
-              total_commits: commits_data.size,
-              average_size: (sizes.sum.to_f / sizes.size).round(2),
-              median_size: calculate_median(sizes),
-              min_size: sizes.min,
-              max_size: sizes.max,
-              small_commits: sizes.count { |s| s <= 10 },
-              medium_commits: sizes.count { |s| s > 10 && s <= 100 },
-              large_commits: sizes.count { |s| s > 100 && s <= 500 },
-              huge_commits: sizes.count { |s| s > 500 },
-              distribution_percentages: calculate_distribution_percentages(sizes),
-            }
+            build_commit_size_stats(commits_data)
           end
 
           def build_metadata(commits_data)
             return super if commits_data.empty?
 
-            total_changes = commits_data.sum { |c| c[:additions] + c[:deletions] }
-            total_additions = commits_data.sum { |c| c[:additions] }
-            total_deletions = commits_data.sum { |c| c[:deletions] }
-
-            super.merge(
-              total_lines_changed: total_changes,
-              total_additions: total_additions,
-              total_deletions: total_deletions,
-              net_lines: total_additions - total_deletions,
-              files_per_commit: (commits_data.sum { |c| c[:files_changed].size }.to_f / commits_data.size).round(2)
-            )
+            metadata = calculate_commit_metadata(commits_data)
+            super.merge(metadata.to_h)
           end
 
           private
 
-          def calculate_median(sizes)
-            sorted = sizes.sort
-            mid = sorted.length / 2
-
-            if sorted.length.odd?
-              sorted[mid]
-            else
-              ((sorted[mid - 1] + sorted[mid]) / 2.0).round(2)
-            end
+          def build_empty_result
+            stats = create_empty_stats
+            stats.to_h
           end
 
-          def calculate_distribution_percentages(sizes)
-            return {} if sizes.empty?
+          def build_commit_size_stats(commits_data)
+            sizes = extract_commit_sizes(commits_data)
+            distribution = categorize_sizes(sizes)
+            stats_calculator = create_statistics_calculator(sizes)
 
-            total = sizes.size
-            {
-              small_percent: ((sizes.count { |s| s <= 10 }.to_f / total) * 100).round(1),
-              medium_percent: ((sizes.count { |s| s > 10 && s <= 100 }.to_f / total) * 100).round(1),
-              large_percent: ((sizes.count { |s| s > 100 && s <= 500 }.to_f / total) * 100).round(1),
-              huge_percent: ((sizes.count { |s| s > 500 }.to_f / total) * 100).round(1),
-            }
+            stats = ValueObjects::CommitSizeStats.new(
+              total_commits: commits_data.size,
+              average_size: stats_calculator.average,
+              median_size: stats_calculator.median,
+              min_size: stats_calculator.min,
+              max_size: stats_calculator.max,
+              distribution: distribution
+            )
+
+            stats.to_h
+          end
+
+          def extract_commit_sizes(commits_data)
+            Services::CommitSizeExtractor.new(commits_data).extract_sizes
+          end
+
+          def categorize_sizes(sizes)
+            Services::CommitSizeCategorizer.new(sizes).categorize
+          end
+
+          def create_statistics_calculator(sizes)
+            Services::CommitSizeStatisticsCalculator.new(sizes)
+          end
+
+          def calculate_commit_metadata(commits_data)
+            Services::CommitMetadataCalculator.new(commits_data).calculate
+          end
+
+          def create_empty_stats
+            empty_distribution = create_empty_distribution
+
+            ValueObjects::CommitSizeStats.new(
+              total_commits: 0,
+              average_size: 0.0,
+              median_size: 0.0,
+              min_size: 0,
+              max_size: 0,
+              distribution: empty_distribution
+            )
+          end
+
+          def create_empty_distribution
+            ValueObjects::SizeDistribution.new(
+              small_commits: 0,
+              medium_commits: 0,
+              large_commits: 0,
+              huge_commits: 0,
+              total_commits: 0
+            )
           end
         end
       end

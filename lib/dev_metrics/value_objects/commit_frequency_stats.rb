@@ -19,7 +19,7 @@ module DevMetrics
       end
 
       def days_with_commits
-        by_date.count { |_, count| count > 0 }
+        by_date.count { |_, count| count.positive? }
       end
 
       def days_without_commits
