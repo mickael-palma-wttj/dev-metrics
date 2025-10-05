@@ -54,6 +54,7 @@ module DevMetrics
           include_merge_commits: !flag?('--exclude-merges'),
           no_progress: flag?('--no-progress'),
           all_time: flag?('--all-time'),
+          analyze: flag?('--analyze'),
         }
       end
 

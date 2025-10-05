@@ -37,6 +37,7 @@ module DevMetrics
               --contributors=X   Focus on specific contributors (comma-separated)
               --interactive      Interactive repository selection
               --recursive        Scan subdirectories for repositories
+              --analyze          Automatically run analysis on found/selected repositories
               --exclude-bots     Exclude bot accounts from analysis
               --exclude-merges   Exclude merge commits from analysis
               --no-progress      Disable progress indicators
@@ -45,7 +46,8 @@ module DevMetrics
               dev-metrics analyze .
               dev-metrics analyze /path/to/repo --format=json --output=metrics.json
               dev-metrics analyze . --all-time --format=text
-              dev-metrics scan /workspace --interactive --metrics=git,pr_throughput
+              dev-metrics scan /workspace --interactive --analyze
+              dev-metrics scan /workspace --recursive --analyze --all-time
               dev-metrics analyze . --since=2024-01-01 --contributors=john.doe
 
             For more information, visit: https://github.com/your-username/dev-metrics-new
