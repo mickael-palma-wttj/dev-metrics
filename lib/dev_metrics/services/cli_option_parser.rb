@@ -69,8 +69,8 @@ module DevMetrics
 
       def extract_path
         command = extract_command
-        path_arg = command == 'analyze' && args.length > 1 ? args[1] : nil
-        path_arg ||= args.find { |arg| !arg.start_with?('--') && arg != command }
+        # Find the first argument that's not a command and not a flag
+        path_arg = args.find { |arg| !arg.start_with?('--') && arg != command }
         File.expand_path(path_arg || '.')
       end
 
