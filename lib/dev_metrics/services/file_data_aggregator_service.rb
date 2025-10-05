@@ -29,7 +29,8 @@ module DevMetrics
 
       # Processes all files in a single commit
       def process_commit_files(commit, file_data)
-        commit[:files_changed].each do |file_change|
+        files = commit[:files_changed] || []
+        files.each do |file_change|
           update_file_data(file_change, commit, file_data)
         end
       end
@@ -37,8 +38,11 @@ module DevMetrics
       # Updates file data with information from a single file change
       def update_file_data(file_change, commit, file_data)
         filename = file_change[:filename]
-        changes = file_change[:additions] + file_change[:deletions]
+        return unless filename
+
+        changes = (file_change[:additions] || 0) + (file_change[:deletions] || 0)
         author = commit[:author_name]
+        return unless author
 
         file_data[filename][:commits] << build_commit_info(commit, changes)
         file_data[filename][:authors][author] += changes

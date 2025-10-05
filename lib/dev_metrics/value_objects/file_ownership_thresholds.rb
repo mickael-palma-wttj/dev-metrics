@@ -29,22 +29,6 @@ module DevMetrics
           categorize_by_ownership_percentage(max_ownership)
         end
 
-        private
-
-        # Categorizes ownership based on percentage thresholds
-        def categorize_by_ownership_percentage(max_ownership)
-          case max_ownership
-          when DOMINANT_OWNER_THRESHOLD..Float::INFINITY
-            'DOMINANT_OWNER'
-          when PRIMARY_OWNER_THRESHOLD...DOMINANT_OWNER_THRESHOLD
-            'PRIMARY_OWNER'
-          when SHARED_OWNERSHIP_THRESHOLD...PRIMARY_OWNER_THRESHOLD
-            'SHARED_OWNERSHIP'
-          else
-            'DISTRIBUTED_OWNERSHIP'
-          end
-        end
-
         # Determines if ownership is highly concentrated
         # @param concentration [Float] the ownership concentration value
         # @return [Boolean] true if concentration is high
@@ -77,6 +61,22 @@ module DevMetrics
             'MODERATE'
           else
             'DISTRIBUTED'
+          end
+        end
+
+        private
+
+        # Categorizes ownership based on percentage thresholds
+        def categorize_by_ownership_percentage(max_ownership)
+          case max_ownership
+          when DOMINANT_OWNER_THRESHOLD..Float::INFINITY
+            'DOMINANT_OWNER'
+          when PRIMARY_OWNER_THRESHOLD...DOMINANT_OWNER_THRESHOLD
+            'PRIMARY_OWNER'
+          when SHARED_OWNERSHIP_THRESHOLD...PRIMARY_OWNER_THRESHOLD
+            'SHARED_OWNERSHIP'
+          else
+            'DISTRIBUTED_OWNERSHIP'
           end
         end
       end

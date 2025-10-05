@@ -12,7 +12,7 @@ module DevMetrics
       def calculate_frequency_metrics
         return default_frequency_metrics if deployments.empty?
 
-        deployment_dates = deployments.map { |d| d[:date] }.sort
+        deployment_dates = extract_deployment_dates
         total_deployments = deployment_dates.size
 
         # Calculate intervals between deployments
@@ -44,6 +44,16 @@ module DevMetrics
       private
 
       attr_reader :deployments, :time_period
+
+      def extract_deployment_dates
+        dates = deployments.map { |deployment| deployment_date(deployment) }
+        dates.compact.sort
+      end
+
+      def deployment_date(deployment)
+        # Handle both hash and value object formats
+        deployment.respond_to?(:date) ? deployment.date : deployment[:date]
+      end
 
       def calculate_deployment_intervals(sorted_dates)
         return [] if sorted_dates.size < 2

@@ -11,7 +11,7 @@ module DevMetrics
       def analyze_deployment_patterns
         return {} if deployments.empty?
 
-        deployment_dates = deployments.map { |d| d[:date] }
+        deployment_dates = deployments.map { |d| extract_date(d) }
 
         {
           by_day_of_week: analyze_by_day_of_week(deployment_dates),
@@ -82,7 +82,7 @@ module DevMetrics
       def calculate_average_interval(deployment_subset)
         return 0.0 if deployment_subset.size < 2
 
-        dates = deployment_subset.map { |d| d[:date] }.sort
+        dates = deployment_subset.map { |d| extract_date(d) }.sort
         intervals = []
 
         (1...dates.size).each do |i|
@@ -99,6 +99,11 @@ module DevMetrics
         return 'declining' if second_avg > first_avg * 1.2
 
         'stable'
+      end
+
+      def extract_date(deployment)
+        # Handle both hash and value object formats
+        deployment.respond_to?(:date) ? deployment.date : deployment[:date]
       end
     end
   end

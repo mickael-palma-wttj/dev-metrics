@@ -30,10 +30,19 @@ module DevMetrics
       end
 
       def process_commit_files(commit, file_authors)
-        commit[:files_changed].each do |file_change|
-          filename = file_change[:filename]
-          file_authors[filename] << commit[:author_name]
+        files = commit[:files_changed] || commit[:files] || []
+        files.each do |file_change|
+          filename = extract_filename(file_change)
+          file_authors[filename] << commit[:author_name] if filename
         end
+      end
+
+      def extract_filename(file_change)
+        return file_change[:filename] if file_change[:filename]
+        return file_change[:file] if file_change[:file]
+        return file_change if file_change.is_a?(String)
+
+        nil
       end
 
       def build_analysis_result(file_authors)

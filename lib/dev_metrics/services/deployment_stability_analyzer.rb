@@ -12,7 +12,7 @@ module DevMetrics
       def calculate_deployment_stability(_commits_data)
         return default_stability_metrics if deployments.empty?
 
-        deployment_dates = deployments.map { |d| d[:date] }.sort
+        deployment_dates = deployments.map { |d| extract_date(d) }.sort
         intervals = calculate_intervals(deployment_dates)
 
         return default_stability_metrics if intervals.empty?
@@ -40,7 +40,7 @@ module DevMetrics
         return {} if deployments.empty? || commits_data.empty?
 
         # Calculate commits per deployment
-        deployment_hashes = deployments.map { |d| d[:commit_hash] }.compact
+        deployment_hashes = deployments.map { |d| extract_commit_hash(d) }.compact
         related_commits = commits_data.select { |c| deployment_hashes.include?(c[:hash]) }
 
         commits_per_deployment = deployments.empty? ? 0 : (related_commits.size.to_f / deployments.size)
@@ -132,6 +132,16 @@ module DevMetrics
         consistency_bonus = consistency * 20
 
         (base_efficiency + consistency_bonus).round(1)
+      end
+
+      def extract_date(deployment)
+        # Handle both hash and value object formats
+        deployment.respond_to?(:date) ? deployment.date : deployment[:date]
+      end
+
+      def extract_commit_hash(deployment)
+        # Handle both hash and value object formats
+        deployment.respond_to?(:commit_hash) ? deployment.commit_hash : deployment[:commit_hash]
       end
     end
   end

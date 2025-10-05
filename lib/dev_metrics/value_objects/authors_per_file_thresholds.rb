@@ -23,11 +23,11 @@ module DevMetrics
       def self.bus_factor_risk_category(author_count)
         case author_count
         when HIGH_RISK_MAX
-          'HIGH'
+          'high'
         when (HIGH_RISK_MAX + 1)..MEDIUM_RISK_MAX
-          'MEDIUM'
+          'medium'
         else
-          'LOW'
+          'low'
         end
       end
 
