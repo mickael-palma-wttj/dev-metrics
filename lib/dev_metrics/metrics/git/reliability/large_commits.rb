@@ -51,7 +51,7 @@ module DevMetrics
               high_risk_authors: count_high_risk_authors(by_author),
               largest_commit_author: find_largest_commit_author(by_author),
               size_threshold_large: thresholds[:large] || 0,
-              size_threshold_huge: thresholds[:huge] || 0
+              size_threshold_huge: thresholds[:huge] || 0,
             }
           end
 
