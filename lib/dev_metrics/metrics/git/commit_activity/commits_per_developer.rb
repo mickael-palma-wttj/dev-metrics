@@ -5,6 +5,7 @@ module DevMetrics
     module Git
       module CommitActivity
         # Calculates commits per developer over a time period
+        # Refactored to follow SOLID principles and use service objects
         class CommitsPerDeveloper < BaseMetric
           def metric_name
             'commits_per_developer'
@@ -22,36 +23,48 @@ module DevMetrics
           end
 
           def compute_metric(contributors_data)
-            return {} if contributors_data.empty?
+            return build_empty_result if contributors_data.empty?
 
-            contributors_by_commits = contributors_data.sort_by { |c| -c[:commit_count] }
-
-            result = {}
-            contributors_by_commits.each do |contributor|
-              key = if contributor[:email]
-                      "#{contributor[:name]} <#{contributor[:email]}>"
-                    else
-                      contributor[:name]
-                    end
-              result[key] = contributor[:commit_count]
-            end
-
-            result
+            build_contributor_stats(contributors_data)
           end
 
           def build_metadata(contributors_data)
-            super.merge(
-              total_contributors: contributors_data.size,
-              total_commits: contributors_data.sum { |c| c[:commit_count] },
-              avg_commits_per_contributor: if contributors_data.empty?
-                                             0
-                                           else
-                                             (contributors_data.sum do |c|
-                                               c[:commit_count]
-                                             end.to_f / contributors_data.size).round(2)
-                                           end,
-              top_contributor: contributors_data.max_by { |c| c[:commit_count] }&.dig(:name)
-            )
+            return super if contributors_data.empty?
+
+            contributor_stats = calculate_contributor_stats(contributors_data)
+            super.merge(build_enhanced_metadata(contributor_stats))
+          end
+
+          private
+
+          def build_empty_result
+            {}
+          end
+
+          def build_contributor_stats(contributors_data)
+            contributor_stats = calculate_contributor_stats(contributors_data)
+            contributor_stats.to_h
+          end
+
+          def calculate_contributor_stats(contributors_data)
+            contributors = transform_contributors(contributors_data)
+            Services::ContributorMetricsCalculator.new(contributors).calculate
+          end
+
+          def transform_contributors(contributors_data)
+            Services::ContributorTransformer.new(contributors_data).transform
+          end
+
+          def build_enhanced_metadata(contributor_stats)
+            {
+              total_contributors: contributor_stats.total_contributors,
+              total_commits: contributor_stats.total_commits,
+              avg_commits_per_contributor: contributor_stats.avg_commits_per_contributor,
+              top_contributor: contributor_stats.top_contributor,
+              top_contributor_dominance: contributor_stats.top_contributor_dominance,
+              balanced_team: contributor_stats.balanced_team?,
+              contributor_distribution: contributor_stats.contributor_distribution,
+            }
           end
         end
       end
