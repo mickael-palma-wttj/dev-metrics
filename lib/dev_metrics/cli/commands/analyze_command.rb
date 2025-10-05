@@ -50,7 +50,7 @@ module DevMetrics
         end
 
         def analyzer
-          @analyzer ||= Analyzers::GitAnalyzer.new(repository, options)
+          @analyzer ||= Analyzers::GitAnalyzer.new(repository, options, build_time_period)
         end
       end
     end

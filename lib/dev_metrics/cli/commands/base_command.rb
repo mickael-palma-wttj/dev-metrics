@@ -64,6 +64,7 @@ module DevMetrics
 
         def parse_first_commit_date(output)
           first_line = output.strip.split("\n").first
+          require 'time'
           Time.parse(first_line)
         end
 

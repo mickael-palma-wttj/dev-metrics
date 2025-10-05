@@ -4,12 +4,13 @@ module DevMetrics
   module Services
     # Service object responsible for executing individual metrics
     class MetricExecutor
-      attr_reader :repository, :options, :progress_reporter
+      attr_reader :repository, :options, :progress_reporter, :time_period
 
-      def initialize(repository, options, progress_reporter)
+      def initialize(repository, options, progress_reporter, time_period = nil)
         @repository = repository
         @options = options
         @progress_reporter = progress_reporter
+        @time_period = time_period
       end
 
       def execute_metrics(metrics_to_run)
@@ -76,7 +77,7 @@ module DevMetrics
 
       def build_metric_options
         {
-          time_period: build_time_period,
+          time_period: time_period || build_time_period,
           contributors: options[:contributors] || [],
           exclude_bots: options[:exclude_bots] || false,
           include_merge_commits: options[:include_merge_commits] || true,

@@ -4,11 +4,12 @@ module DevMetrics
   module Analyzers
     # Orchestrates Git metrics collection and analysis
     class GitAnalyzer
-      attr_reader :repository, :analysis_options, :results
+      attr_reader :repository, :analysis_options, :results, :time_period
 
-      def initialize(repository, options = {})
+      def initialize(repository, options = {}, time_period = nil)
         @repository = repository
         @analysis_options = ValueObjects::AnalysisOptions.new(options)
+        @time_period = time_period
         @results = {}
       end
 
@@ -57,7 +58,8 @@ module DevMetrics
         executor = Services::MetricExecutor.new(
           repository,
           analysis_options.to_h,
-          progress_reporter
+          progress_reporter,
+          time_period
         )
 
         executor.execute_metrics(metrics_to_run)
