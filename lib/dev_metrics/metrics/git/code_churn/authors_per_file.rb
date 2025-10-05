@@ -6,6 +6,13 @@ module DevMetrics
       module CodeChurn
         # Analyzes how many authors have touched each file
         class AuthorsPerFile < BaseMetric
+          def initialize(repository, options = {})
+            super
+            @author_analyzer = Services::AuthorAnalysisService.new
+            @risk_analyzer = Services::BusFactorRiskAnalyzer.new
+            @score_calculator = Services::CollaborationScoreCalculator.new
+          end
+
           def metric_name
             'authors_per_file'
           end
@@ -22,30 +29,7 @@ module DevMetrics
           end
 
           def compute_metric(commits_data)
-            return {} if commits_data.empty?
-
-            file_authors = Hash.new { |h, k| h[k] = Set.new }
-
-            commits_data.each do |commit|
-              commit[:files_changed].each do |file_change|
-                filename = file_change[:filename]
-                file_authors[filename] << commit[:author_name]
-              end
-            end
-
-            # Convert to final format with author counts and lists
-            result = {}
-            file_authors.each do |filename, authors_set|
-              result[filename] = {
-                author_count: authors_set.size,
-                authors: authors_set.to_a.sort,
-                bus_factor_risk: categorize_bus_factor_risk(authors_set.size),
-                ownership_type: categorize_ownership(authors_set.size),
-              }
-            end
-
-            # Sort by author count (highest first - most shared ownership)
-            result.sort_by { |_, stats| -stats[:author_count] }.to_h
+            author_analyzer.analyze_file_authors(commits_data)
           end
 
           def build_metadata(commits_data)
@@ -53,64 +37,22 @@ module DevMetrics
 
             result = compute_metric(commits_data)
 
-            author_counts = result.values.map { |s| s[:author_count] }
-            total_files = result.size
+            base_metadata = super
+            risk_analysis = risk_analyzer.analyze_risk_distribution(result)
+            author_stats = risk_analyzer.calculate_author_statistics(result)
+            collaboration_score = score_calculator.calculate_score(result)
 
-            # Risk categorization
-            single_author_files = result.select { |_, s| s[:author_count] == 1 }.size
-            shared_files = result.select { |_, s| s[:author_count] > 1 && s[:author_count] <= 3 }.size
-            highly_shared_files = result.select { |_, s| s[:author_count] > 3 }.size
-
-            super.merge(
-              total_files_analyzed: total_files,
-              avg_authors_per_file: total_files.positive? ? (author_counts.sum.to_f / total_files).round(2) : 0,
-              max_authors_per_file: author_counts.max || 0,
-              min_authors_per_file: author_counts.min || 0,
-              single_author_files: single_author_files,
-              shared_files: shared_files,
-              highly_shared_files: highly_shared_files,
-              bus_factor_risk_percentage: total_files.positive? ? (single_author_files.to_f / total_files * 100).round(1) : 0,
-              collaboration_score: calculate_collaboration_score(result)
-            )
+            merge_metadata(base_metadata, risk_analysis, author_stats, collaboration_score)
           end
 
           private
 
-          def categorize_bus_factor_risk(author_count)
-            case author_count
-            when 1
-              'HIGH' # Single point of failure
-            when 2..3
-              'MEDIUM' # Limited knowledge sharing
-            else
-              'LOW' # Good knowledge distribution
-            end
-          end
+          attr_reader :author_analyzer, :risk_analyzer, :score_calculator
 
-          def categorize_ownership(author_count)
-            case author_count
-            when 1
-              'SINGLE_OWNER' # One person knows this file
-            when 2..3
-              'SHARED' # Small team ownership
-            when 4..10
-              'COLLABORATIVE' # Good team collaboration
-            else
-              'HIGHLY_COLLABORATIVE' # Very distributed ownership
-            end
-          end
-
-          def calculate_collaboration_score(result)
-            return 0 if result.empty?
-
-            total_files = result.size
-            single_owner = result.count { |_, s| s[:author_count] == 1 }
-            shared = result.count { |_, s| s[:author_count] > 1 && s[:author_count] <= 3 }
-            collaborative = result.count { |_, s| s[:author_count] > 3 }
-
-            # Weight the score: collaborative files get more points, penalize single owner
-            score = ((shared * 50) + (collaborative * 100) - (single_owner * 10)).to_f / total_files
-            [score, 100].min.round(1)
+          def merge_metadata(base, risk_analysis, author_stats, collaboration_score)
+            base.merge(risk_analysis)
+              .merge(author_stats)
+              .merge(collaboration_score: collaboration_score)
           end
         end
       end
