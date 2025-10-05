@@ -5,8 +5,11 @@ module DevMetrics
     # Service for classifying commit messages into categories
     class CommitClassifier
       BUGFIX_PATTERNS = [
+        # Conventional commits
         /^fix\b/,
+        /^fix\(/,
         /^bugfix/,
+        # Traditional patterns
         /\bfix\s+(bug|issue|error|problem)/,
         /\b(bug|error|issue)\s+fix/,
         /\bresol(ve|ution)\b/,
@@ -15,11 +18,22 @@ module DevMetrics
         /\bcorrect/,
         /\brepair/,
         /\bhandle\s+(error|exception)/,
+        # Specific patterns from analysis
+        /\baddress\s+(warning|error)/,
+        /\bprevent\s+(error|exception|crash)/,
+        /\bmake\s+.+\s+nullable/,
+        /\bstrict\s+.+\s+validation/,
+        # Case variations
+        /^Fix:/,
+        /^FIX:/,
       ].freeze
 
       FEATURE_PATTERNS = [
+        # Conventional commits
         /^feat\b/,
+        /^feat\(/,
         /^feature/,
+        # Traditional patterns
         /^add\b/,
         /^implement/,
         /^create/,
@@ -28,17 +42,39 @@ module DevMetrics
         /\bimprove/,
         /\bupgrade/,
         /\bextend/,
+        # Domain-specific patterns
+        /\bopen\s+.+\s+creation/,
+        /\breplace\s+.+\s+by\s+/,
+        /\bbroadcast\s+.+\s+(from|to)/,
+        /\balign\s+.+\s+versions/,
+        /\bupdate\s+.+\s+(funnel|hiring)/,
+        # Allow/Enable patterns
+        /^allow\s+/,
+        /^enable\s+/,
       ].freeze
 
       MAINTENANCE_PATTERNS = [
-        /^refactor/,
+        # Conventional commits
+        /^chore\b/,
+        /^chore\(/,
+        /^refactor\b/,
+        /^refactor\(/,
+        /^style\b/,
+        /^test\b/,
+        /^docs\b/,
+        # Build and dependency management
+        /^build\(/,
+        /^Build\(/,
+        /^ci\(/,
+        /\bBuild\(deps\)/,
+        /\bBuild\(deps-dev\)/,
+        /\bbump\s+.+\s+from\s+.+\s+to\s+/,
+        /\bupdate\s+.+\s+dependencies/,
+        # Traditional patterns
         /^clean/,
         /^update/,
-        /^chore/,
-        /^style/,
         /^format/,
         /^lint/,
-        /^test/,
         /^spec/,
         /\bdocument/,
         /\bcomment/,
@@ -47,6 +83,17 @@ module DevMetrics
         /\breorg/,
         /\bmove\s/,
         /\brename/,
+        # Configuration and setup
+        /\bupdate\s+(ci|config|codeowners)/,
+        /\bchange\s+.+\s+to\s+match\s+/,
+        /\bmigrate\s+to\s+/,
+        /\bdowngrade\s+/,
+      ].freeze
+
+      MERGE_PATTERNS = [
+        /^Merge\s+(pull\s+request|branch)/,
+        /^Merge\s+/,
+        /^merge\s+/i,
       ].freeze
 
       def initialize(commits_data)
@@ -66,6 +113,7 @@ module DevMetrics
       end
 
       def classify_message(message)
+        return :merge if matches_patterns?(message, MERGE_PATTERNS)
         return :bugfix if matches_patterns?(message, BUGFIX_PATTERNS)
         return :feature if matches_patterns?(message, FEATURE_PATTERNS)
         return :maintenance if matches_patterns?(message, MAINTENANCE_PATTERNS)
@@ -82,6 +130,7 @@ module DevMetrics
           bugfix: [],
           feature: [],
           maintenance: [],
+          merge: [],
           other: [],
         }
       end
