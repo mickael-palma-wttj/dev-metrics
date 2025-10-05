@@ -6,11 +6,9 @@ module DevMetrics
       module CodeChurn
         # Analyzes how many authors have touched each file
         class AuthorsPerFile < BaseMetric
-          def initialize(repository, options = {})
-            super
-            @author_analyzer = Services::AuthorAnalysisService.new
-            @risk_analyzer = Services::BusFactorRiskAnalyzer.new
-            @score_calculator = Services::CollaborationScoreCalculator.new
+          def initialize(repository, time_period = nil, options = {}, analysis_service: nil)
+            super(repository, time_period, options)
+            @analysis_service = analysis_service || Services::AuthorAnalysisService.new
           end
 
           def metric_name

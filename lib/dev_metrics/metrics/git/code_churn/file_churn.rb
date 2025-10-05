@@ -7,8 +7,8 @@ module DevMetrics
         # Identifies files with high churn (frequent changes)
         # Orchestrates churn analysis using injected service dependencies
         class FileChurn < BaseMetric
-          def initialize(repository, options = {}, analysis_service: nil)
-            super(repository, options)
+          def initialize(repository, time_period = nil, options = {}, analysis_service: nil)
+            super(repository, time_period, options)
             @analysis_service = analysis_service || Services::ChurnAnalysisService.new
           end
 

@@ -7,8 +7,8 @@ module DevMetrics
         # Identifies files that are frequently changed together
         # Orchestrates co-change analysis using injected service dependencies
         class CoChangePairs < BaseMetric
-          def initialize(repository, options = {}, analysis_service: nil)
-            super(repository, options)
+          def initialize(repository, time_period = nil, options = {}, analysis_service: nil)
+            super(repository, time_period, options)
             @analysis_service = analysis_service || Services::CoChangeAnalysisService.new
           end
 
