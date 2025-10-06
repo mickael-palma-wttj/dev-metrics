@@ -81,32 +81,40 @@
             padding: 30px; 
             border-radius: 12px; 
             margin-bottom: 40px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-        }
-        
-        .summary-item { 
-            background: white;
-            padding: 16px 20px;
-            border-radius: 8px;
-            border-left: 4px solid #4f46e5;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         
-        .summary-item strong {
-            color: #4a5568;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: block;
-            margin-bottom: 4px;
+        .summary .metric-summary-table {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
-        .summary-value {
-            color: #1a202c;
-            font-size: 1.25rem;
+        .summary .metric-summary-table td {
+            padding: 14px 16px;
+        }
+        
+        .summary .metric-summary-table td:first-child {
             font-weight: 600;
+            color: #4a5568;
+            width: 25%;
+            background: #f8fafc;
+            border-right: 2px solid #e2e8f0;
+        }
+        
+        .summary .metric-summary-table td:last-child {
+            color: #1a202c;
+            font-size: 1.05rem;
+        }
+        
+        .summary code {
+            background: #f1f5f9;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #475569;
+            font-family: 'Monaco', 'Courier New', monospace;
         }
         /* Metric Cards */
         .metric { 
@@ -704,49 +712,54 @@
         
         <div class="content">
         <div class="summary">
-            <% if summary[:repository_info] %>
-            <div class="summary-item">
-                <strong>Repository</strong>
-                <div class="summary-value"><%= summary[:repository_info][:name] %></div>
-            </div>
-            <div class="summary-item">
-                <strong>Path</strong>
-                <div class="summary-value"><%= truncate_text(summary[:repository_info][:path], 50) %></div>
-            </div>
-            <div class="summary-item">
-                <strong>Analyzed</strong>
-                <div class="summary-value"><%= summary[:repository_info][:analyzed_at] %></div>
-            </div>
-            <% end %>
-            <% if summary[:time_period] %>
-            <% time_period_hash = summary[:time_period].respond_to?(:to_h) ? summary[:time_period].to_h : summary[:time_period] %>
-            <div class="summary-item">
-                <strong>Time Period</strong>
-                <div class="summary-value"><%= time_period_hash[:start_date].strftime('%Y-%m-%d') %> to <%= time_period_hash[:end_date].strftime('%Y-%m-%d') %></div>
-            </div>
-            <div class="summary-item">
-                <strong>Duration</strong>
-                <div class="summary-value"><%= time_period_hash[:duration_days] %> days</div>
-            </div>
-            <% end %>
-            <% if summary[:contributor_filter] %>
-            <div class="contributor-filter">
-                <strong>Filtered by Contributors:</strong> <%= summary[:contributor_filter][:contributors].join(', ') %> 
-                (<%= summary[:contributor_filter][:count] %> contributor<%= 's' if summary[:contributor_filter][:count] != 1 %>)
-            </div>
-            <% end %>
-            <div class="summary-item">
-                <strong>Total Metrics</strong>
-                <div class="summary-value"><%= summary[:total_metrics] || 0 %></div>
-            </div>
-            <div class="summary-item">
-                <strong>Execution Time</strong>
-                <div class="summary-value"><%= format_execution_time(summary[:execution_time]) %></div>
-            </div>
-            <div class="summary-item">
-                <strong>Data Coverage</strong>
-                <div class="summary-value"><%= summary[:data_coverage] || 0 %>%</div>
-            </div>
+            <table class="metric-summary-table">
+                <% if summary[:repository_info] %>
+                <tr>
+                    <td>Repository</td>
+                    <td><strong><%= summary[:repository_info][:name] %></strong></td>
+                </tr>
+                <tr>
+                    <td>Path</td>
+                    <td><code><%= truncate_text(summary[:repository_info][:path], 80) %></code></td>
+                </tr>
+                <tr>
+                    <td>Analyzed</td>
+                    <td><%= summary[:repository_info][:analyzed_at] %></td>
+                </tr>
+                <% end %>
+                <% if summary[:time_period] %>
+                <% time_period_hash = summary[:time_period].respond_to?(:to_h) ? summary[:time_period].to_h : summary[:time_period] %>
+                <tr>
+                    <td>Time Period</td>
+                    <td><%= time_period_hash[:start_date].strftime('%Y-%m-%d') %> to <%= time_period_hash[:end_date].strftime('%Y-%m-%d') %></td>
+                </tr>
+                <tr>
+                    <td>Duration</td>
+                    <td><%= time_period_hash[:duration_days] %> days</td>
+                </tr>
+                <% end %>
+                <% if summary[:contributor_filter] %>
+                <tr>
+                    <td>Filtered Contributors</td>
+                    <td>
+                        <span class="count"><%= summary[:contributor_filter][:count] %></span>
+                        <%= summary[:contributor_filter][:contributors].join(', ') %>
+                    </td>
+                </tr>
+                <% end %>
+                <tr>
+                    <td>Total Metrics</td>
+                    <td><span class="count"><%= summary[:total_metrics] || 0 %></span></td>
+                </tr>
+                <tr>
+                    <td>Execution Time</td>
+                    <td><%= format_execution_time(summary[:execution_time]) %></td>
+                </tr>
+                <tr>
+                    <td>Data Coverage</td>
+                    <td><span class="percentage"><%= summary[:data_coverage] || 0 %>%</span></td>
+                </tr>
+            </table>
         </div>
 
         <% categories = group_analysis_results(results) %>
