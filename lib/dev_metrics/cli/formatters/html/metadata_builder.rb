@@ -32,9 +32,9 @@ module DevMetrics
           def build_details
             return '' unless metadata
 
-            html = +'<table class="metric-summary-table">'
+            html = +'<table class="metric-summary-table">'.encode('UTF-8')
             add_detail_items(html)
-            html << '</table>'
+            html << '</table>'.encode('UTF-8')
             html
           end
 

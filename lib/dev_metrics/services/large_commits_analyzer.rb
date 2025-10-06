@@ -81,7 +81,7 @@ module DevMetrics
         huge_commits = commit_sizes.count { |c| c[:size] >= thresholds[:huge] }
 
         total_size = commit_sizes.sum { |c| c[:size] }
-        avg_size = total_commits > 0 ? (total_size.to_f / total_commits).round(2) : 0.0
+        avg_size = total_commits.positive? ? (total_size.to_f / total_commits).round(2) : 0.0
 
         {
           total_commits: total_commits,

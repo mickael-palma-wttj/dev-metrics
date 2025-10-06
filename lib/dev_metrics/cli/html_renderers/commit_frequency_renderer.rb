@@ -57,8 +57,6 @@ module DevMetrics
           render_heatmap_html(hours_data, max_commits)
         end
 
-        private
-
         def calculate_intensity(count, max_commits)
           return 0 if max_commits.zero?
 
@@ -139,7 +137,7 @@ module DevMetrics
 
         def find_peak_hour(hours_data)
           peak = hours_data.max_by { |data| data[:count] }
-          peak[:count] > 0 ? peak[:label] : 'None'
+          peak[:count].positive? ? peak[:label] : 'None'
         end
 
         def render_work_pattern

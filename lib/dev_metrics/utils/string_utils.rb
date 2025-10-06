@@ -5,7 +5,8 @@ module DevMetrics
     # Utility module for string operations - replaces global String monkey patching
     module StringUtils
       def self.humanize(string)
-        string.to_s.gsub(/[_-]/, ' ').split.map(&:capitalize).join(' ')
+        safe_string = safe_to_utf8(string.to_s)
+        safe_string.gsub(/[_-]/, ' ').split.map(&:capitalize).join(' ')
       end
 
       def self.titleize(string)
@@ -15,7 +16,18 @@ module DevMetrics
       def self.truncate(text, length)
         return text unless text
 
-        text.length > length ? "#{text[0...length]}..." : text
+        safe_text = safe_to_utf8(text.to_s)
+        safe_text.length > length ? "#{safe_text[0...length]}..." : safe_text
+      end
+
+      def self.safe_to_utf8(string)
+        return string if string.encoding == Encoding::UTF_8 && string.valid_encoding?
+
+        # Handle encoding issues by forcing UTF-8 and cleaning invalid bytes
+        string.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
+      rescue Encoding::UndefinedConversionError, Encoding::InvalidByteSequenceError
+        # Fallback for severe encoding issues
+        string.force_encoding('UTF-8').scrub('?')
       end
 
       def self.format_execution_time(time_seconds)

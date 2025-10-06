@@ -29,7 +29,7 @@ module DevMetrics
         when Hash
           format_hash_for_metric
         else
-          @value.to_s
+          safe_to_s(@value)
         end
       end
 
@@ -44,7 +44,7 @@ module DevMetrics
         when Array
           "#{@value.length} items"
         else
-          @value.to_s
+          safe_to_s(@value)
         end
       end
 
@@ -57,7 +57,7 @@ module DevMetrics
         when Numeric
           @value.is_a?(Float) ? format('%.2f', @value) : @value.to_s
         else
-          @value.to_s
+          safe_to_s(@value)
         end
       end
 
@@ -85,10 +85,21 @@ module DevMetrics
 
       def format_array_for_metadata
         if @value.length <= 3
-          @value.join(', ')
+          @value.map { |v| safe_to_s(v) }.join(', ')
         else
           "#{@value.length} items"
         end
+      end
+
+      def safe_to_s(value)
+        str = value.to_s
+        return str if str.encoding == Encoding::UTF_8 && str.valid_encoding?
+
+        # Handle encoding issues by forcing UTF-8 and cleaning invalid bytes
+        str.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
+      rescue Encoding::UndefinedConversionError, Encoding::InvalidByteSequenceError
+        # Fallback for severe encoding issues
+        str.force_encoding('UTF-8').scrub('?')
       end
     end
   end
