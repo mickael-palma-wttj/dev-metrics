@@ -84,7 +84,7 @@ module DevMetrics
       end
 
       # Cache management delegation
-      
+
       # Clears all cached command results and resets statistics
       #
       # @return [void]
@@ -358,7 +358,7 @@ module DevMetrics
           enabled: @enabled,
           hit_rate: calculate_hit_rate,
           hits: @hits,
-          misses: @misses
+          misses: @misses,
         }
       end
 
