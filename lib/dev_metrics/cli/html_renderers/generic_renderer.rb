@@ -35,14 +35,14 @@ module DevMetrics
             end
           end
         end
-        
+
         def render_hash_as_data_table
-          data_table(['Metric', 'Value']) do
+          data_table(%w[Metric Value]) do
             @value.map do |key, val|
               table_row([
-                Utils::StringUtils.humanize(key.to_s),
-                Utils::ValueFormatter.format_generic_value(val)
-              ])
+                          Utils::StringUtils.humanize(key.to_s),
+                          Utils::ValueFormatter.format_generic_value(val),
+                        ])
             end.join
           end
         end
