@@ -34,12 +34,12 @@ module DevMetrics
         end
 
         def metric_details
-          "<div class=\"metric-details\">#{yield}</div>"
+          "<table class=\"metric-summary-table\">#{yield}</table>"
         end
 
         def metric_detail(label, value, css_class = nil)
           span_class = css_class ? " class=\"#{css_class}\"" : ''
-          "<div class=\"metric-detail\"><strong>#{label}:</strong> <span#{span_class}>#{value}</span></div>"
+          "<tr><td>#{label}</td><td><span#{span_class}>#{value}</span></td></tr>"
         end
 
         def data_table(headers)

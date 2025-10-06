@@ -153,7 +153,7 @@ module DevMetrics
         repository_name = File.basename(@repository_path)
         extension = format_extension(@format)
 
-        "./report/#{repository_name}_metrics_#{timestamp}.#{extension}"
+        "./report/#{repository_name}/#{repository_name}_metrics_#{timestamp}.#{extension}"
       end
 
       private

@@ -32,9 +32,9 @@ module DevMetrics
           def build_details
             return '' unless metadata
 
-            html = +'<div class="metric-details">'
+            html = +'<table class="metric-summary-table">'
             add_detail_items(html)
-            html << '</div>'
+            html << '</table>'
             html
           end
 
@@ -52,7 +52,7 @@ module DevMetrics
             metadata.each do |key, value|
               next if SKIP_KEYS.include?(key)
 
-              html << build_detail_item(key, value)
+              html << build_detail_row(key, value)
             end
           end
 
@@ -60,12 +60,12 @@ module DevMetrics
             "<p><strong>#{key.to_s.capitalize}:</strong> #{value}</p>"
           end
 
-          def build_detail_item(key, value)
+          def build_detail_row(key, value)
             [
-              '<div class="metric-detail">',
-              "<strong>#{Utils::StringUtils.humanize(key.to_s)}:</strong> ",
-              Utils::ValueFormatter.format_metadata_value(value),
-              '</div>',
+              '<tr>',
+              "<td>#{Utils::StringUtils.humanize(key.to_s)}</td>",
+              "<td>#{Utils::ValueFormatter.format_metadata_value(value)}</td>",
+              '</tr>',
             ].join
           end
         end

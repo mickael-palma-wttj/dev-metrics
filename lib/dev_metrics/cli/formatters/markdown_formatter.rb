@@ -11,6 +11,15 @@ module DevMetrics
             Formatters::TextFormatter.new(template_renderer).format_analysis_results(results, summary)
           end
         end
+
+        # Template helper methods
+        def group_analysis_results(results)
+          results.group_by { |_, data| data[:metadata][:category] }
+        end
+
+        def format_metric_value(value)
+          Utils::ValueFormatter.format_metric_value(value)
+        end
       end
     end
   end

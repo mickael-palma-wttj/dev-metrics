@@ -28,7 +28,7 @@ module DevMetrics
       end
 
       def summary
-        Services::AnalysisSummaryBuilder.new(@results, repository).build
+        Services::AnalysisSummaryBuilder.new(@results, repository, @time_period).build
       end
 
       def results_for_category(category)

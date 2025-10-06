@@ -6,23 +6,27 @@ module DevMetrics
   module Services
     # Service object responsible for building analysis summaries
     class AnalysisSummaryBuilder
-      attr_reader :results, :repository
+      attr_reader :results, :repository, :time_period
 
-      def initialize(results, repository)
+      def initialize(results, repository, time_period = nil)
         @results = results
         @repository = repository
+        @time_period = time_period
       end
 
       def build
         return {} if results.empty?
 
-        {
+        summary = {
           total_metrics: results.size,
           categories: build_categories_summary,
           execution_time: calculate_total_execution_time,
           data_coverage: calculate_data_coverage,
           repository_info: build_repository_info,
         }
+
+        summary[:time_period] = time_period if time_period
+        summary
       end
 
       private

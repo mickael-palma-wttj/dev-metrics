@@ -3,145 +3,639 @@
 <head>
     <title>Git Metrics Analysis Report</title>
     <style>
+        /* Modern CSS Reset and Base Styles */
+        * {
+            box-sizing: border-box;
+        }
+        
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             margin: 0; 
-            padding: 40px; 
-            background-color: #f8f9fa; 
-            color: #333;
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #2d3748;
+            line-height: 1.6;
+            min-height: 100vh;
         }
+        
         .container { 
-            max-width: 1200px; 
+            max-width: 1400px; 
             margin: 0 auto; 
-            background: white; 
-            padding: 40px; 
-            border-radius: 8px; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
-        }
-        h1 { 
-            color: #2c3e50; 
-            border-bottom: 3px solid #3498db; 
-            padding-bottom: 15px; 
-            margin-bottom: 30px; 
-        }
-        h2 { 
-            color: #34495e; 
-            margin-top: 40px; 
-            margin-bottom: 20px; 
-            border-left: 4px solid #3498db; 
-            padding-left: 15px; 
-        }
-        .summary { 
-            background: #ecf0f1; 
-            padding: 20px; 
-            border-radius: 6px; 
-            margin-bottom: 30px; 
-        }
-        .summary-item { 
-            margin: 8px 0; 
-            font-weight: 500; 
-        }
-        .metric { 
-            margin: 20px 0; 
-            padding: 20px; 
             background: #ffffff; 
-            border: 1px solid #e0e0e0; 
-            border-radius: 6px; 
-            border-left: 4px solid #27ae60; 
+            border-radius: 16px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1); 
+            overflow: hidden;
         }
+        
+        /* Header Section */
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        h1 { 
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 8px;
+        }
+        
+        /* Content Section */
+        .content {
+            padding: 40px;
+        }
+        
+        h2 { 
+            color: #1a202c;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 50px 0 30px 0;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        h2::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 30px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border-radius: 2px;
+        }
+        /* Summary Section */
+        .summary { 
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border: 1px solid #e2e8f0;
+            padding: 30px; 
+            border-radius: 12px; 
+            margin-bottom: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .summary-item { 
+            background: white;
+            padding: 16px 20px;
+            border-radius: 8px;
+            border-left: 4px solid #4f46e5;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .summary-item strong {
+            color: #4a5568;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .summary-value {
+            color: #1a202c;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        /* Metric Cards */
+        .metric { 
+            margin: 30px 0; 
+            background: #ffffff; 
+            border: 1px solid #e2e8f0;
+            border-radius: 12px; 
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .metric:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .metric-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 24px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
         .metric-name { 
-            font-weight: bold; 
-            font-size: 1.1em; 
-            color: #2c3e50; 
-            margin-bottom: 10px; 
+            font-weight: 700; 
+            font-size: 1.25rem; 
+            color: #1a202c; 
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .metric-name::before {
+            content: '📊';
+            font-size: 1.5rem;
+        }
+        
+        .metric-body {
+            padding: 24px;
         }
         .metric-details { 
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-            gap: 15px; 
-            margin-top: 10px; 
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
+            gap: 16px; 
+            margin: 20px 0;
         }
+        
         .metric-detail { 
-            background: #f8f9fa; 
-            padding: 10px; 
-            border-radius: 4px; 
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 16px; 
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
         }
+        
+        .metric-detail:hover {
+            background: #edf2f7;
+        }
+        
         .metric-detail strong { 
-            color: #2c3e50; 
+            color: #4a5568;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 4px;
         }
-        .success { 
-            color: #27ae60; 
-            font-weight: bold; 
-        }
-        .contributor-filter {
-            background: #e8f4fd;
-            border-left: 4px solid #3498db;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
-        .metric-section {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
-        }
-        .metric-section h4 {
-            color: #34495e;
-            margin: 0 0 10px 0;
-            font-size: 1em;
+        
+        .metric-detail-value {
+            color: #1a202c;
+            font-size: 1.1rem;
             font-weight: 600;
         }
-        .nested-data {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 10px 0;
+        /* Status and Indicators */
+        .success { 
+            color: #10b981;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
+        
+        .success::before {
+            content: '✅';
+            font-size: 1rem;
+        }
+        
+        .contributor-filter {
+            background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+            border: 1px solid #c7d2fe;
+            border-left: 4px solid #4f46e5;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+        
+        /* Metric Sections */
+        .metric-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #f1f5f9;
+        }
+        
+        .metric-section h4 {
+            color: #374151;
+            margin: 0 0 16px 0;
+            font-size: 1.125rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .metric-section h4::before {
+            content: '▸';
+            color: #6366f1;
+            font-weight: bold;
+        }
+        .nested-data {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+        
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 10px 0;
+            margin: 16px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
+        
         .data-table th,
         .data-table td {
-            padding: 8px 12px;
+            padding: 12px 16px;
             text-align: left;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #e2e8f0;
         }
+        
         .data-table th {
-            background: #f8f9fa;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
             font-weight: 600;
-            color: #2c3e50;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.875rem;
         }
+        
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+        /* Value Indicators */
         .percentage {
-            color: #27ae60;
-            font-weight: 500;
+            color: #10b981;
+            font-weight: 600;
+            background: #d1fae5;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.875rem;
         }
+        
         .count {
-            color: #3498db;
+            color: #3b82f6;
+            font-weight: 600;
+            background: #dbeafe;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.875rem;
+        }
+        
+        .risk-high {
+            color: #ef4444;
+            font-weight: 700;
+            background: #fee2e2;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.875rem;
+        }
+        
+        h5 {
+            color: #374151;
+            margin: 20px 0 12px 0;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        /* Compact Tables */
+        .metric-summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 0.9rem;
+        }
+        
+        .metric-summary-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+        }
+        
+        .metric-summary-table td:first-child {
+            font-weight: 600;
+            color: #4a5568;
+            width: 30%;
+            background: #f8fafc;
+        }
+        
+        .metric-summary-table td:last-child {
+            color: #1a202c;
+        }
+        
+        /* Toggle Sections */
+        .toggle-section {
+            margin: 20px 0;
+        }
+        
+        .toggle-header {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: #374151;
+            transition: all 0.2s ease;
+        }
+        
+        .toggle-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .toggle-right {
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-icon {
+            font-size: 1.1rem;
+            color: #6366f1;
+        }
+        
+        .section-title {
+            font-size: 0.95rem;
+            letter-spacing: 0.3px;
+        }
+        
+        .toggle-header:hover {
+            background: #e2e8f0;
+            transform: translateY(-1px);
+        }
+        
+        .toggle-icon {
+            font-size: 0.8rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .toggle-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            border-left: 1px solid #e2e8f0;
+            border-right: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+        }
+        
+        .toggle-content.expanded {
+            max-height: 2000px;
+            transition: max-height 0.3s ease-in;
+        }
+        
+        .toggle-content-inner {
+            padding: 16px;
+            background: #fefefe;
+        }
+        
+        .toggle-section.expanded .toggle-icon {
+            transform: rotate(90deg);
+        }
+        
+        /* Commit Heatmap Styles */
+        .commit-heatmap {
+            background: #fefefe;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+        
+        .heatmap-legend {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            font-size: 0.85rem;
+        }
+        
+        .legend-label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+        
+        .legend-scale {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .legend-box {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .legend-none { background: #f8fafc; }
+        .legend-low { background: #dbeafe; }
+        .legend-medium { background: #93c5fd; }
+        .legend-high { background: #3b82f6; }
+        
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 4px;
+            margin-bottom: 16px;
+        }
+        
+        .heatmap-cell {
+            aspect-ratio: 1;
+            border-radius: 4px;
+            border: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .heatmap-cell:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10;
+        }
+        
+        .cell-hour {
+            font-size: 0.7rem;
+            font-weight: 600;
+            line-height: 1;
+        }
+        
+        .cell-count {
+            font-size: 0.6rem;
+            line-height: 1;
+            opacity: 0.8;
+        }
+        
+        .intensity-none {
+            background: #f8fafc;
+            color: #64748b;
+        }
+        
+        .intensity-low {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .intensity-medium {
+            background: #93c5fd;
+            color: #1e3a8a;
+        }
+        
+        .intensity-high {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .heatmap-summary {
+            display: flex;
+            gap: 24px;
+            padding-top: 12px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .summary-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: #6b7280;
             font-weight: 500;
         }
-        .risk-high {
-            color: #e74c3c;
+        
+        .stat-value {
+            font-size: 0.85rem;
+            color: #1f2937;
             font-weight: 600;
         }
-        h5 {
-            color: #2c3e50;
-            margin: 15px 0 8px 0;
-            font-size: 0.9em;
-            font-weight: 600;
+        
+        .heatmap-empty {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 8px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .summary {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+            
+            .metric-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .metric-summary-table td:first-child {
+                width: 40%;
+            }
+            
+            .heatmap-grid {
+                grid-template-columns: repeat(8, 1fr);
+            }
+            
+            .heatmap-summary {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .heatmap-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+            
+            .legend-scale {
+                flex-wrap: wrap;
+            }
         }
     </style>
+    <script>
+        function toggleSection(element) {
+            const section = element.parentElement;
+            const content = section.querySelector('.toggle-content');
+            const isExpanded = section.classList.contains('expanded');
+            
+            if (isExpanded) {
+                section.classList.remove('expanded');
+                content.classList.remove('expanded');
+            } else {
+                section.classList.add('expanded');
+                content.classList.add('expanded');
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // No auto-expansion needed since sections have their own default states
+        });
+    </script>
 </head>
 <body>
     <div class="container">
-        <h1>Git Metrics Analysis Report</h1>
+        <div class="header">
+            <h1>Git Metrics Analysis Report</h1>
+            <div class="subtitle">Comprehensive repository analysis and insights</div>
+        </div>
         
+        <div class="content">
         <div class="summary">
             <% if summary[:repository_info] %>
-            <div class="summary-item"><strong>Repository:</strong> <%= summary[:repository_info][:name] %></div>
-            <div class="summary-item"><strong>Path:</strong> <%= summary[:repository_info][:path] %></div>
-            <div class="summary-item"><strong>Analyzed:</strong> <%= summary[:repository_info][:analyzed_at] %></div>
+            <div class="summary-item">
+                <strong>Repository</strong>
+                <div class="summary-value"><%= summary[:repository_info][:name] %></div>
+            </div>
+            <div class="summary-item">
+                <strong>Path</strong>
+                <div class="summary-value"><%= truncate_text(summary[:repository_info][:path], 50) %></div>
+            </div>
+            <div class="summary-item">
+                <strong>Analyzed</strong>
+                <div class="summary-value"><%= summary[:repository_info][:analyzed_at] %></div>
+            </div>
+            <% end %>
+            <% if summary[:time_period] %>
+            <% time_period_hash = summary[:time_period].respond_to?(:to_h) ? summary[:time_period].to_h : summary[:time_period] %>
+            <div class="summary-item">
+                <strong>Time Period</strong>
+                <div class="summary-value"><%= time_period_hash[:start_date].strftime('%Y-%m-%d') %> to <%= time_period_hash[:end_date].strftime('%Y-%m-%d') %></div>
+            </div>
+            <div class="summary-item">
+                <strong>Duration</strong>
+                <div class="summary-value"><%= time_period_hash[:duration_days] %> days</div>
+            </div>
             <% end %>
             <% if summary[:contributor_filter] %>
             <div class="contributor-filter">
@@ -149,9 +643,18 @@
                 (<%= summary[:contributor_filter][:count] %> contributor<%= 's' if summary[:contributor_filter][:count] != 1 %>)
             </div>
             <% end %>
-            <div class="summary-item"><strong>Total Metrics:</strong> <%= summary[:total_metrics] || 0 %></div>
-            <div class="summary-item"><strong>Execution Time:</strong> <%= format_execution_time(summary[:execution_time]) %></div>
-            <div class="summary-item"><strong>Data Coverage:</strong> <%= summary[:data_coverage] || 0 %>%</div>
+            <div class="summary-item">
+                <strong>Total Metrics</strong>
+                <div class="summary-value"><%= summary[:total_metrics] || 0 %></div>
+            </div>
+            <div class="summary-item">
+                <strong>Execution Time</strong>
+                <div class="summary-value"><%= format_execution_time(summary[:execution_time]) %></div>
+            </div>
+            <div class="summary-item">
+                <strong>Data Coverage</strong>
+                <div class="summary-value"><%= summary[:data_coverage] || 0 %>%</div>
+            </div>
         </div>
 
         <% categories = group_analysis_results(results) %>
@@ -161,59 +664,76 @@
         <% metrics.each do |metric_name, data| %>
         <% metric_result = data[:metric] %>
         <div class="metric">
-            <div class="metric-name"><%= string_utils.titleize(metric_name.to_s) %></div>
-            
-            <!-- Basic Info -->
-            <div class="metric-details">
-                <div class="metric-detail">
-                    <strong>Status:</strong> <span class="success">✅ Success</span>
-                </div>
-                <div class="metric-detail">
-                    <strong>Category:</strong> <%= string_utils.titleize(data[:category].to_s) %>
-                </div>
-                <div class="metric-detail">
-                    <strong>Data Points:</strong> <%= metric_result.metadata[:data_points] || 0 %> <%= metric_result.metadata[:data_points_label] || 'records' %>
-                </div>
-                <div class="metric-detail">
-                    <strong>Execution Time:</strong> <%= format_execution_time(data[:execution_time]) %>ms
-                </div>
+            <div class="metric-header">
+                <div class="metric-name"><%= string_utils.titleize(metric_name.to_s) %></div>
             </div>
+            <div class="metric-body">
+            <!-- Summary Table -->
+            <table class="metric-summary-table">
+                <tr>
+                    <td>Status</td>
+                    <td><span class="success">Success</span></td>
+                </tr>
+                <tr>
+                    <td>Category</td>
+                    <td><%= string_utils.titleize(data[:category].to_s) %></td>
+                </tr>
+                <tr>
+                    <td>Data Points</td>
+                    <td><span class="count"><%= metric_result.metadata[:data_points] || 0 %></span> <%= metric_result.metadata[:data_points_label] || 'records' %></td>
+                </tr>
+                <tr>
+                    <td>Execution Time</td>
+                    <td><%= format_execution_time(data[:execution_time]) %>ms</td>
+                </tr>
+            </table>
 
-            <!-- Time Period -->
-            <% if metric_result.time_period %>
-            <% time_period_hash = metric_result.time_period.respond_to?(:to_h) ? metric_result.time_period.to_h : metric_result.time_period %>
-            <div class="metric-section">
-                <h4>Time Period</h4>
-                <div class="metric-details">
-                    <div class="metric-detail">
-                        <strong>Duration:</strong> <%= time_period_hash[:duration_days] %> days
-                    </div>
-                    <div class="metric-detail">
-                        <strong>From:</strong> <%= time_period_hash[:start_date].to_s %>
-                    </div>
-                    <div class="metric-detail">
-                        <strong>To:</strong> <%= time_period_hash[:end_date].to_s %>
-                    </div>
-                </div>
-            </div>
-            <% end %>
 
-            <!-- Detailed Metric Value -->
-            <div class="metric-section">
-                <h4>Metric Details</h4>
-                <%= render_metric_details(metric_name, metric_result.value) %>
-            </div>
 
-            <!-- Metadata -->
+            <!-- Additional Information (opened by default) -->
             <% if metric_result.metadata && !metric_result.metadata.empty? %>
-            <div class="metric-section">
-                <h4>Additional Information</h4>
-                <%= render_metadata_details(metric_result.metadata) %>
+            <div class="toggle-section expanded">
+                <div class="toggle-header" onclick="toggleSection(this)">
+                    <div class="toggle-left">
+                        <span class="section-icon">ℹ️</span>
+                        <span class="section-title">Additional Information</span>
+                    </div>
+                    <div class="toggle-right">
+                        <span class="toggle-icon">&#9654;</span>
+                    </div>
+                </div>
+                <div class="toggle-content expanded">
+                    <div class="toggle-content-inner">
+                        <%= render_metadata_details(metric_result.metadata) %>
+                    </div>
+                </div>
             </div>
             <% end %>
+
+            <!-- Detailed Metric Value (closed by default) -->
+            <div class="toggle-section">
+                <div class="toggle-header" onclick="toggleSection(this)">
+                    <div class="toggle-left">
+                        <span class="section-icon">📊</span>
+                        <span class="section-title">Metric Details</span>
+                    </div>
+                    <div class="toggle-right">
+                        <span class="toggle-icon">&#9654;</span>
+                    </div>
+                </div>
+                <div class="toggle-content">
+                    <div class="toggle-content-inner">
+                        <div class="metric-details-container">
+                            <%= render_metric_details(metric_name, metric_result.value) %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
         </div>
         <% end %>
         <% end %>
+        </div>
     </div>
 </body>
 </html>

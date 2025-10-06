@@ -17,7 +17,7 @@ module DevMetrics
 
         raise ArgumentError, "Template not found: #{template_path}" unless File.exist?(template_path)
 
-        template_content = File.read(template_path)
+        template_content = File.read(template_path, encoding: 'UTF-8')
         erb = ERB.new(template_content, trim_mode: '-')
         erb.result(binding_context)
       end

@@ -82,9 +82,9 @@ module DevMetrics
         filename = "#{repository_name}_metrics_#{timestamp}.#{file_extension}"
 
         if options[:output]
-          File.join(options[:output], filename)
+          File.join(options[:output], repository_name, filename)
         else
-          File.join('./report', filename)
+          File.join('./report', repository_name, filename)
         end
       end
 
