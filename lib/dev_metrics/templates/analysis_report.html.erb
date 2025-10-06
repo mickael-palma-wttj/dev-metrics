@@ -234,13 +234,40 @@
             margin: 16px 0;
         }
         
+        .data-table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            overflow-x: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin: 16px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 16px 0;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin: 0;
+            min-width: 500px;
+        }
+        
+        .data-table.sortable th {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+        
+        .data-table.sortable th:hover {
+            background: linear-gradient(135deg, #3730a3 0%, #6b21a8 100%);
+        }
+        
+        .sort-indicator {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8rem;
+            opacity: 0.7;
         }
         
         .data-table th,
@@ -257,6 +284,10 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-size: 0.875rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            padding-right: 30px;
         }
         
         .data-table tbody tr:hover {
@@ -600,7 +631,68 @@
         
         document.addEventListener('DOMContentLoaded', function() {
             // No auto-expansion needed since sections have their own default states
+            initializeSortableTables();
         });
+        
+        function initializeSortableTables() {
+            const tables = document.querySelectorAll('.data-table.sortable');
+            tables.forEach(table => {
+                const headers = table.querySelectorAll('th');
+                headers.forEach((header, index) => {
+                    header.addEventListener('click', () => sortTable(table, index));
+                    header.innerHTML += '<span class="sort-indicator">↕</span>';
+                });
+            });
+        }
+        
+        function sortTable(table, columnIndex) {
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const header = table.querySelectorAll('th')[columnIndex];
+            const indicator = header.querySelector('.sort-indicator');
+            
+            // Clear other indicators
+            table.querySelectorAll('.sort-indicator').forEach(ind => {
+                if (ind !== indicator) ind.textContent = '↕';
+            });
+            
+            // Determine sort direction
+            let ascending = true;
+            if (indicator.textContent === '↑') {
+                ascending = false;
+                indicator.textContent = '↓';
+            } else {
+                ascending = true;  
+                indicator.textContent = '↑';
+            }
+            
+            // Sort rows
+            rows.sort((a, b) => {
+                const aValue = getCellValue(a, columnIndex);
+                const bValue = getCellValue(b, columnIndex);
+                
+                // Try numeric comparison first
+                const aNum = parseFloat(aValue.replace(/[,%]/g, ''));
+                const bNum = parseFloat(bValue.replace(/[,%]/g, ''));
+                
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                    return ascending ? aNum - bNum : bNum - aNum;
+                }
+                
+                // Fallback to string comparison
+                return ascending ? 
+                    aValue.localeCompare(bValue) : 
+                    bValue.localeCompare(aValue);
+            });
+            
+            // Re-append sorted rows
+            rows.forEach(row => tbody.appendChild(row));
+        }
+        
+        function getCellValue(row, columnIndex) {
+            const cell = row.cells[columnIndex];
+            return cell ? cell.textContent.trim() : '';
+        }
     </script>
 </head>
 <body>
@@ -673,10 +765,6 @@
                 <tr>
                     <td>Status</td>
                     <td><span class="success">Success</span></td>
-                </tr>
-                <tr>
-                    <td>Category</td>
-                    <td><%= string_utils.titleize(data[:category].to_s) %></td>
                 </tr>
                 <tr>
                     <td>Data Points</td>

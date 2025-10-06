@@ -6,7 +6,7 @@ module DevMetrics
       module HTML
         # Builder for metadata sections with extracted methods
         class MetadataBuilder
-          SKIP_KEYS = %i[data_points data_points_label computed_at execution_time].freeze
+          SKIP_KEYS = %i[data_points data_points_label computed_at execution_time options_used].freeze
 
           def self.build_metadata_section(metadata)
             new(metadata).build_section

@@ -42,9 +42,21 @@ module DevMetrics
           "<tr><td>#{label}</td><td><span#{span_class}>#{value}</span></td></tr>"
         end
 
-        def data_table(headers)
+        def data_table(headers, sortable: true)
+          sortable_class = sortable ? ' sortable' : ''
           header_row = headers.map { |h| "<th>#{h}</th>" }.join
-          "<table class=\"data-table\"><tr>#{header_row}</tr>#{yield}</table>"
+          <<~HTML
+            <div class="data-table-container">
+              <table class="data-table#{sortable_class}">
+                <thead>
+                  <tr>#{header_row}</tr>
+                </thead>
+                <tbody>
+                  #{yield}
+                </tbody>
+              </table>
+            </div>
+          HTML
         end
 
         def table_row(cells)
