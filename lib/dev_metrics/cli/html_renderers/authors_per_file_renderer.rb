@@ -3,12 +3,12 @@
 module DevMetrics
   module CLI
     module HtmlRenderers
-      # Specialized renderer for File Churn metric showing file statistics
-      class FileChurnRenderer < Base
+      # Specialized renderer for Authors Per File metric showing file ownership distribution
+      class AuthorsPerFileRenderer < Base
         def render_content
           case @value
           when Hash
-            render_file_churn_stats_table
+            render_authors_per_file_stats_table
           else
             render_simple_data
           end
@@ -16,13 +16,12 @@ module DevMetrics
 
         private
 
-        def render_file_churn_stats_table
-          headers = ['Filename', 'Total Churn', 'Additions', 'Deletions', 'Net Changes', 'Commits', 'Authors Count',
-                     'Avg Churn/Commit', 'Churn Ratio',]
+        def render_authors_per_file_stats_table
+          headers = ['Filename', 'Author Count', 'Authors', 'Bus Factor', 'Ownership Type']
           data_table(headers) do
             @value.map do |filename, stats|
               if stats.is_a?(Hash)
-                render_file_stats_columns(filename, stats)
+                render_file_author_stats_columns(filename, stats)
               else
                 # Fallback for unexpected data format
                 table_row([filename, safe_value_format(stats)])
@@ -31,18 +30,19 @@ module DevMetrics
           end
         end
 
-        def render_file_stats_columns(filename, stats)
+        def render_file_author_stats_columns(filename, stats)
           safe_filename = safe_string(filename)
+          authors = stats[:authors].is_a?(Array) ? stats[:authors].join(', ') : stats[:authors].to_s
+          safe_authors = safe_string(authors)
+          bus_factor = stats[:bus_factor_risk].to_s
+          ownership = stats[:ownership_type].to_s
+
           cells = [
             safe_filename,
-            format_number(stats[:total_churn]),
-            format_number(stats[:additions]),
-            format_number(stats[:deletions]),
-            format_number(stats[:net_changes]),
-            format_number(stats[:commits]),
-            format_number(stats[:authors_count]),
-            format_float(stats[:avg_churn_per_commit]),
-            "#{format_float(stats[:churn_ratio])}%",
+            format_number(stats[:author_count]),
+            safe_authors,
+            bus_factor,
+            ownership,
           ]
           table_row(cells)
         end
@@ -51,12 +51,6 @@ module DevMetrics
           return '' if value.nil?
 
           "<span class=\"count\">#{number_with_delimiter(value.to_i)}</span>"
-        end
-
-        def format_float(value)
-          return '' if value.nil?
-
-          "<span class=\"percentage\">#{format('%.2f', value)}</span>"
         end
 
         def number_with_delimiter(num)
