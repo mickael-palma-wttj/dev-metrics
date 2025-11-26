@@ -11,6 +11,7 @@ module DevMetrics
             'large_commits' => 'DevMetrics::CLI::HtmlRenderers::LargeCommitsRenderer',
             'bugfix_ratio' => 'DevMetrics::CLI::HtmlRenderers::BugfixRatioRenderer',
             'lines_changed' => 'DevMetrics::CLI::HtmlRenderers::LinesChangedRenderer',
+            'file_churn' => 'DevMetrics::CLI::HtmlRenderers::FileChurnRenderer',
           }.freeze
 
           DEFAULT_RENDERER = 'DevMetrics::CLI::HtmlRenderers::GenericRenderer'
