@@ -81,11 +81,12 @@ module DevMetrics
           section('Deployment Patterns', tooltip) do
             data_table(%w[Metric Value]) do
               patterns.map do |key, value|
-                if value.is_a?(Numeric)
+                case value
+                when Numeric
                   table_row([format_label(key), format('%.2f', value)])
-                elsif value.is_a?(Array)
+                when Array
                   table_row([format_label(key), format_number(value.length)])
-                elsif value.is_a?(Hash)
+                when Hash
                   table_row([format_label(key), format_number(value.size)])
                 else
                   table_row([format_label(key), safe_string(value.to_s)])
@@ -161,11 +162,12 @@ module DevMetrics
             headers = %w[Trend Value]
             data_table(headers) do
               trends.map do |key, value|
-                if value.is_a?(Numeric)
+                case value
+                when Numeric
                   table_row([format_label(key), format('%.2f', value)])
-                elsif value.is_a?(Array)
+                when Array
                   table_row([format_label(key), format_number(value.length)])
-                elsif value.is_a?(Hash)
+                when Hash
                   table_row([format_label(key), format_number(value.size)])
                 else
                   table_row([format_label(key), safe_string(value.to_s)])

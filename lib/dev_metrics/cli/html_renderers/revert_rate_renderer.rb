@@ -26,7 +26,7 @@ module DevMetrics
         end
 
         def render_overall_statistics
-          return unless @value[:overall]&.is_a?(Hash)
+          return unless @value[:overall].is_a?(Hash)
 
           overall = @value[:overall]
           tooltip = Services::MetricDescriptions.get_section_description('Overall Statistics')
@@ -44,7 +44,7 @@ module DevMetrics
         end
 
         def render_by_author
-          return unless @value[:by_author]&.is_a?(Hash) && @value[:by_author].any?
+          return unless @value[:by_author].is_a?(Hash) && @value[:by_author].any?
 
           tooltip = Services::MetricDescriptions.get_section_description('Revert Statistics by Author')
           section('Revert Statistics by Author', tooltip) do
@@ -67,7 +67,7 @@ module DevMetrics
         end
 
         def render_revert_details
-          return unless @value[:revert_details]&.is_a?(Hash)
+          return unless @value[:revert_details].is_a?(Hash)
 
           details = @value[:revert_details]
           output = []
@@ -92,7 +92,7 @@ module DevMetrics
           end
 
           # Revert Reasons
-          if details[:revert_reasons]&.is_a?(Hash) && details[:revert_reasons].any?
+          if details[:revert_reasons].is_a?(Hash) && details[:revert_reasons].any?
             tooltip_reasons = Services::MetricDescriptions.get_section_description('Revert Reasons')
             output << section('Revert Reasons', tooltip_reasons) do
               headers = %w[Reason Count]
@@ -112,13 +112,13 @@ module DevMetrics
         end
 
         def render_time_patterns
-          return unless @value[:time_patterns]&.is_a?(Hash)
+          return unless @value[:time_patterns].is_a?(Hash)
 
           patterns = @value[:time_patterns]
           output = []
 
           # By Hour of Day
-          if patterns[:by_hour_of_day]&.is_a?(Hash) && patterns[:by_hour_of_day].any?
+          if patterns[:by_hour_of_day].is_a?(Hash) && patterns[:by_hour_of_day].any?
             tooltip_hour = Services::MetricDescriptions.get_section_description('Revert Pattern by Hour of Day')
             output << section('Revert Pattern by Hour of Day', tooltip_hour) do
               headers = %w[Hour Count]
@@ -135,7 +135,7 @@ module DevMetrics
           end
 
           # By Day of Week
-          if patterns[:by_day_of_week]&.is_a?(Hash) && patterns[:by_day_of_week].any?
+          if patterns[:by_day_of_week].is_a?(Hash) && patterns[:by_day_of_week].any?
             tooltip_day = Services::MetricDescriptions.get_section_description('Revert Pattern by Day of Week')
             output << section('Revert Pattern by Day of Week', tooltip_day) do
               headers = %w[Day Count]

@@ -106,8 +106,6 @@ module DevMetrics
         section_descriptions[section_title.to_sym] || nil
       end
 
-      private
-
       def self.section_descriptions
         {
           'Overall Classification': 'Breakdown of total commits classified as bugfixes versus features',

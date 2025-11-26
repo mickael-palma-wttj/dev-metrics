@@ -41,7 +41,7 @@ module DevMetrics
                 table_row(['Feature Commits',
                            "#{format_number(overall[:feature_commits])} (#{format('%.1f',
                                                                                   overall[:feature_ratio].to_f)}%)",]),
-                table_row(['Quality Score', "#{format('%.2f', overall[:quality_score].to_f)}"]),
+                table_row(['Quality Score', format('%.2f', overall[:quality_score].to_f).to_s]),
               ].join
             end
           end

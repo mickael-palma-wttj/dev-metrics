@@ -105,13 +105,14 @@ module DevMetrics
             headers = %w[Metric Value]
             data_table(headers) do
               bottlenecks.map do |key, value|
-                if value.is_a?(Array)
+                case value
+                when Array
                   formatted_value = value.empty? ? '0' : render_bottleneck_array(value)
                   table_row([format_label(key), formatted_value])
-                elsif value.is_a?(Hash)
+                when Hash
                   formatted_value = value.empty? ? '0' : render_bottleneck_hash(value)
                   table_row([format_label(key), formatted_value])
-                elsif value.is_a?(Numeric)
+                when Numeric
                   table_row([format_label(key), format('%.2f', value)])
                 else
                   table_row([format_label(key), safe_string(value)])
@@ -143,13 +144,14 @@ module DevMetrics
             headers = %w[Trend Value]
             data_table(headers) do
               @value[:trends].map do |key, value|
-                if value.is_a?(Array)
+                case value
+                when Array
                   formatted_value = value.empty? ? '0' : format_number(value.length)
                   table_row([format_label(key), formatted_value])
-                elsif value.is_a?(Hash)
+                when Hash
                   formatted_value = value.empty? ? '0' : format_number(value.size)
                   table_row([format_label(key), formatted_value])
-                elsif value.is_a?(Numeric)
+                when Numeric
                   table_row([format_label(key), format('%.2f', value)])
                 else
                   table_row([format_label(key), safe_string(value)])
