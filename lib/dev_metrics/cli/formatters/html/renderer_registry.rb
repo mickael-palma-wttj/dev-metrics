@@ -14,6 +14,7 @@ module DevMetrics
             'file_churn' => 'DevMetrics::CLI::HtmlRenderers::FileChurnRenderer',
             'authors_per_file' => 'DevMetrics::CLI::HtmlRenderers::AuthorsPerFileRenderer',
             'file_ownership' => 'DevMetrics::CLI::HtmlRenderers::FileOwnershipRenderer',
+            'co_change_pairs' => 'DevMetrics::CLI::HtmlRenderers::CoChangePairsRenderer',
           }.freeze
 
           DEFAULT_RENDERER = 'DevMetrics::CLI::HtmlRenderers::GenericRenderer'

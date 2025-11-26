@@ -92,6 +92,7 @@ module DevMetrics
         case options[:format]&.to_s
         when 'json' then 'json'
         when 'csv' then 'csv'
+        when 'html' then 'html'
         else 'txt'
         end
       end
