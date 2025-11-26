@@ -10,6 +10,7 @@ module DevMetrics
             'commit_frequency' => 'DevMetrics::CLI::HtmlRenderers::CommitFrequencyRenderer',
             'large_commits' => 'DevMetrics::CLI::HtmlRenderers::LargeCommitsRenderer',
             'bugfix_ratio' => 'DevMetrics::CLI::HtmlRenderers::BugfixRatioRenderer',
+            'lines_changed' => 'DevMetrics::CLI::HtmlRenderers::LinesChangedRenderer',
           }.freeze
 
           DEFAULT_RENDERER = 'DevMetrics::CLI::HtmlRenderers::GenericRenderer'
