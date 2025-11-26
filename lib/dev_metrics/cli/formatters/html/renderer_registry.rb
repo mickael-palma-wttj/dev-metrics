@@ -13,6 +13,7 @@ module DevMetrics
             'lines_changed' => 'DevMetrics::CLI::HtmlRenderers::LinesChangedRenderer',
             'file_churn' => 'DevMetrics::CLI::HtmlRenderers::FileChurnRenderer',
             'authors_per_file' => 'DevMetrics::CLI::HtmlRenderers::AuthorsPerFileRenderer',
+            'file_ownership' => 'DevMetrics::CLI::HtmlRenderers::FileOwnershipRenderer',
           }.freeze
 
           DEFAULT_RENDERER = 'DevMetrics::CLI::HtmlRenderers::GenericRenderer'
