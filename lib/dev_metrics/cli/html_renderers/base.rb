@@ -29,8 +29,12 @@ module DevMetrics
           "<div class=\"nested-data\">#{yield}</div>"
         end
 
-        def section(title)
-          "<h5>#{title}</h5>#{yield}"
+        def section(title, tooltip_text = nil)
+          if tooltip_text
+            "<h5>#{with_tooltip(title, tooltip_text)}</h5>#{yield}"
+          else
+            "<h5>#{title}</h5>#{yield}"
+          end
         end
 
         def metric_details
@@ -62,6 +66,24 @@ module DevMetrics
         def table_row(cells)
           cell_content = cells.map { |cell| "<td>#{cell}</td>" }.join
           "<tr>#{cell_content}</tr>"
+        end
+
+        def with_tooltip(text, tooltip_text)
+          escaped_tooltip = tooltip_text.gsub('"', '&quot;').gsub("'", '&#39;')
+          "<span class=\"tooltip\">#{text}<span class=\"tooltip-text\">#{escaped_tooltip}</span></span>"
+        end
+
+        def safe_string(value)
+          return '' if value.nil?
+
+          value.to_s.gsub('<', '&lt;').gsub('>', '&gt;').gsub('"', '&quot;')
+        end
+
+        def format_number(value, decimals = 2)
+          return '0' if value.nil?
+          return value.to_s unless value.is_a?(Numeric)
+
+          format("%.#{decimals}f", value)
         end
       end
     end

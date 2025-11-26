@@ -52,7 +52,12 @@ module DevMetrics
           template_binding = binding
           data.each { |key, value| template_binding.local_variable_set(key, value) }
           template_binding.local_variable_set(:string_utils, Utils::StringUtils)
+          template_binding.local_variable_set(:metric_description, method(:metric_description))
           template_binding
+        end
+
+        def metric_description(metric_name)
+          Services::MetricDescriptions.get_description(metric_name)
         end
       end
     end

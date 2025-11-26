@@ -7,25 +7,37 @@ module DevMetrics
         protected
 
         def render_content
-          [
-            render_daily_activity,
-            render_hourly_distribution,
-            render_work_pattern,
-          ].compact.join
+          case @value
+          when Hash
+            render_frequency_analysis
+          else
+            render_simple_data
+          end
         end
 
         private
 
+        def render_frequency_analysis
+          [
+            render_daily_activity,
+            render_hourly_distribution,
+            render_work_pattern,
+            render_by_author,
+          ].compact.join
+        end
+
         def render_daily_activity
           return unless @value[:commits_per_day]
 
-          section('Daily Activity') do
-            metric_details do
-              commits_per_day = @value[:commits_per_day]
+          commits_per_day = @value[:commits_per_day]
+          tooltip = Services::MetricDescriptions.get_section_description('Time Patterns')
+          section('Daily Activity', tooltip) do
+            data_table(%w[Metric Value]) do
               [
-                metric_detail('Average per day', commits_per_day[:average], 'count'),
-                metric_detail('Max in a day', commits_per_day[:max], 'count'),
-                metric_detail('Total commits', @value[:total_commits], 'count'),
+                table_row(['Average per Day', format_number(commits_per_day[:average].to_i)]),
+                table_row(['Max in a Day', format_number(commits_per_day[:max].to_i)]),
+                table_row(['Min in a Day', format_number(commits_per_day[:min].to_i)]),
+                table_row(['Total Commits', format_number(@value[:total_commits].to_i)]),
               ].join
             end
           end
@@ -34,13 +46,14 @@ module DevMetrics
         def render_hourly_distribution
           return unless @value[:commits_per_hour]&.any?
 
-          section('Hourly Distribution') do
+          tooltip = Services::MetricDescriptions.get_section_description('Time Patterns')
+          section('Hourly Distribution', tooltip) do
             render_heatmap(@value[:commits_per_hour])
           end
         end
 
         def render_heatmap(commits_per_hour)
-          max_commits = commits_per_hour.values.max
+          max_commits = commits_per_hour.values.max.to_i
           return '<div class="heatmap-empty">No commit data available</div>' if max_commits.zero?
 
           hours_data = (0..23).map do |hour|
@@ -143,23 +156,61 @@ module DevMetrics
         def render_work_pattern
           return unless @value[:working_hours_commits]
 
-          section('Work Pattern') do
-            metric_details do
-              working_hours = @value[:working_hours_commits]
+          working_hours = @value[:working_hours_commits]
+          tooltip = Services::MetricDescriptions.get_section_description('Time Patterns')
+          section('Work Pattern', tooltip) do
+            data_table(%w[Category Percentage Count]) do
               [
-                metric_detail(
-                  'Working hours',
-                  "#{working_hours[:working_hours_percentage]}% (#{working_hours[:working_hours]} commits)",
-                  'percentage'
-                ),
-                metric_detail(
-                  'Off hours',
-                  "#{working_hours[:off_hours_percentage]}% (#{working_hours[:off_hours]} commits)",
-                  'percentage'
-                ),
+                table_row(['Working Hours', "#{format('%.1f', working_hours[:working_hours_percentage].to_f)}%",
+                           format_number(working_hours[:working_hours].to_i),]),
+                table_row(['Off Hours', "#{format('%.1f', working_hours[:off_hours_percentage].to_f)}%",
+                           format_number(working_hours[:off_hours].to_i),]),
               ].join
             end
           end
+        end
+
+        def render_by_author
+          return unless @value[:by_author]&.any?
+
+          tooltip = Services::MetricDescriptions.get_section_description('Distribution by Author')
+          section('Commits by Author', tooltip) do
+            headers = ['Author', 'Total Commits', 'Avg per Day', 'Max in a Day']
+            data_table(headers) do
+              @value[:by_author].first(20).map do |author, stats|
+                cells = [
+                  safe_string(author),
+                  format_number(stats[:total_commits].to_i),
+                  format('%.1f', stats[:avg_per_day].to_f),
+                  format_number(stats[:max_in_day].to_i),
+                ]
+                table_row(cells)
+              end.join
+            end
+          end
+        end
+
+        def format_number(value)
+          return '' if value.nil?
+
+          "<span class=\"count\">#{number_with_delimiter(value.to_i)}</span>"
+        end
+
+        def number_with_delimiter(num)
+          num.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\\1,')
+        end
+
+        def render_simple_data
+          metric_detail('Value', Utils::ValueFormatter.format_generic_value(@value))
+        end
+
+        def safe_string(value)
+          str = value.to_s
+          return str if str.encoding == Encoding::UTF_8 && str.valid_encoding?
+
+          str.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
+        rescue Encoding::UndefinedConversionError, Encoding::InvalidByteSequenceError
+          value.to_s.force_encoding('UTF-8').scrub('?')
         end
       end
     end

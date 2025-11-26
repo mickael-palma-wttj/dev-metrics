@@ -92,10 +92,85 @@ gem install rspec
 - **lead_time**: Development cycle efficiency
 - **deployment_frequency**: Release cadence analysis
 
+## HTML Report Features
+
+The HTML reports generated with `--format=html` include:
+
+### **Specialized Metric Renderers**
+Each metric type has a customized HTML renderer optimizing data visualization:
+
+- **LeadTimeRenderer**: Lead Time metrics with production release tracking
+  - Overall deployment metrics with flow efficiency
+  - Author performance breakdown
+  - Lead time distribution analysis
+  - Bottleneck identification
+  - Trend analysis and recent releases
+
+- **BugfixRatioRenderer**: Bug fix pattern analysis
+  - Overall classification with quality scores
+  - Per-author bugfix statistics
+  - File-level bugfix distribution
+  - Trend tracking over time
+
+- **LargeCommitsRenderer**: Code quality risk assessment
+  - Commit size thresholds and risk scores
+  - Largest commits with impact analysis
+  - Per-author large commit patterns
+  - Files prone to oversized changes
+
+- **CommitFrequencyRenderer**: Development activity patterns
+  - Daily and hourly commit distribution
+  - Interactive heatmap with intensity visualization
+  - Work pattern analysis (working vs. off hours)
+  - Per-author frequency metrics
+
+- **RevertRateRenderer**: Code stability and revert analysis
+  - Overall revert statistics with stability scores
+  - Per-author revert rate and reliability scoring
+  - Recent reverts with detailed commit information
+  - Revert reasons categorization
+  - Time-based patterns (by hour and day of week)
+
+- **FileChurnRenderer, LinesChangedRenderer, AuthorsPerFileRenderer, CoChangePairsRenderer, FileOwnershipRenderer**: Specialized data tables with sortable columns and comprehensive statistics
+
+### **Report Structure**
+Each metric includes:
+- Summary table with key statistics
+- Additional information section (collapsible, expanded by default)
+- Detailed metric data with interactive tables
+- Color-coded indicators (success/warning/error)
+- Responsive data tables with proper formatting
+
 ## Example Output
 
 ```bash
-$ ./bin/dev-metrics analyze --all-time
+$ ./bin/dev-metrics analyze --format html
+
+Analyzing repository at: /path/to/your/project
+Repository: your-project
+Time period: 2024-01-01 to 2025-10-05
+Metrics: all
+Format: html
+
+Analyzing 13 Git metrics...
+✅ Analysis complete! Analyzed 13 metrics
+
+Results written to: ./report/your-project_metrics_20251005_153019.html
+```
+
+**Generated HTML features**:
+- Modern responsive design with gradient headers
+- **Interactive tooltips** on all metric names with descriptions
+- Collapsible toggle sections for detailed metrics
+- Sortable data tables with sticky headers
+- Commit activity heatmaps with legend
+- Color-coded risk indicators
+- Professional styling with hover effects
+
+_Hover over metric names to see descriptions and helpful information_
+
+```bash
+$ ./bin/dev-metrics analyze --all-time --format=text
 
 Analyzing repository at: /path/to/your/project
 Repository: your-project

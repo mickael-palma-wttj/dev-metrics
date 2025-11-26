@@ -50,6 +50,14 @@ module DevMetrics
           HTML::TemplateHelpers.format_metric_value(value)
         end
 
+        def metric_description(metric_name)
+          Services::MetricDescriptions.get_description(metric_name)
+        end
+
+        def metric_description_text(metric_name)
+          Services::MetricDescriptions.description_for_metric(metric_name)
+        end
+
         private
 
         def format_html_fallback(results, summary)

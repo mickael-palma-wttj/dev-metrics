@@ -15,6 +15,9 @@ module DevMetrics
             'authors_per_file' => 'DevMetrics::CLI::HtmlRenderers::AuthorsPerFileRenderer',
             'file_ownership' => 'DevMetrics::CLI::HtmlRenderers::FileOwnershipRenderer',
             'co_change_pairs' => 'DevMetrics::CLI::HtmlRenderers::CoChangePairsRenderer',
+            'revert_rate' => 'DevMetrics::CLI::HtmlRenderers::RevertRateRenderer',
+            'lead_time' => 'DevMetrics::CLI::HtmlRenderers::LeadTimeRenderer',
+            'deployment_frequency' => 'DevMetrics::CLI::HtmlRenderers::DeploymentFrequencyRenderer',
           }.freeze
 
           DEFAULT_RENDERER = 'DevMetrics::CLI::HtmlRenderers::GenericRenderer'

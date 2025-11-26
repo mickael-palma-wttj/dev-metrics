@@ -62,7 +62,9 @@ module DevMetrics
 
         intervals = []
         (1...sorted_dates.size).each do |i|
-          interval_days = (sorted_dates[i] - sorted_dates[i - 1]).to_i
+          # Calculate days between deployments (divide seconds by 86400)
+          interval_seconds = (sorted_dates[i] - sorted_dates[i - 1]).to_i
+          interval_days = (interval_seconds / 86_400.0).round(2)
           intervals << interval_days
         end
         intervals

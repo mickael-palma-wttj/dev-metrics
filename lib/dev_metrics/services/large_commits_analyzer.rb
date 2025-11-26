@@ -133,10 +133,10 @@ module DevMetrics
       def find_largest_commits(commit_sizes)
         commit_sizes.sort_by { |c| -c[:size] }.first(10).map do |commit|
           {
-            size: commit[:size],
-            author: commit[:author],
+            calculated_size: commit[:size],
+            author_name: commit[:author],
             hash: commit[:hash][0..7],
-            message: commit[:message]&.slice(0, 100),
+            subject: commit[:message]&.slice(0, 100),
             date: commit[:date],
           }
         end
