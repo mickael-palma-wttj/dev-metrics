@@ -36,11 +36,9 @@ module DevMetrics
               [
                 table_row(['Total Commits', format_number(overall[:total_commits])]),
                 table_row(['Bugfix Commits',
-                           "#{format_number(overall[:bugfix_commits])} (#{format('%.1f',
-                                                                                 overall[:bugfix_ratio].to_f)}%)",]),
+                           "#{format_number(overall[:bugfix_commits])} (#{format_percentage_plain(overall[:bugfix_ratio].to_f)}%)",]),
                 table_row(['Feature Commits',
-                           "#{format_number(overall[:feature_commits])} (#{format('%.1f',
-                                                                                  overall[:feature_ratio].to_f)}%)",]),
+                           "#{format_number(overall[:feature_commits])} (#{format_percentage_plain(overall[:feature_ratio].to_f)}%)",]),
                 table_row(['Quality Score', format('%.2f', overall[:quality_score].to_f).to_s]),
               ].join
             end
@@ -59,8 +57,8 @@ module DevMetrics
                   safe_string(author),
                   format_number(stats[:total_commits].to_i),
                   format_number(stats[:bugfix_commits].to_i),
-                  format('%.1f', stats[:bugfix_ratio].to_f),
-                  format('%.2f', stats[:quality_score].to_f),
+                  format_percentage_plain(stats[:bugfix_ratio].to_f),
+                  format_float_plain(stats[:quality_score].to_f),
                 ]
                 table_row(cells)
               end.join
@@ -80,7 +78,7 @@ module DevMetrics
                   safe_string(file),
                   format_number(stats[:bugfix_commits].to_i),
                   format_number(stats[:total_commits].to_i),
-                  format('%.1f', stats[:bugfix_ratio].to_f),
+                  format_percentage_plain(stats[:bugfix_ratio].to_f),
                 ]
                 table_row(cells)
               end.join
@@ -100,15 +98,13 @@ module DevMetrics
                   safe_string(period),
                   format_number(stats[:bugfix_commits].to_i),
                   format_number(stats[:total_commits].to_i),
-                  format('%.1f', stats[:bugfix_ratio].to_f),
+                  format_percentage_plain(stats[:bugfix_ratio].to_f),
                 ]
                 table_row(cells)
               end.join
             end
           end
         end
-
-
       end
     end
   end

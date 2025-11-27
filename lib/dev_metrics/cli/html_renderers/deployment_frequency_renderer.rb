@@ -39,8 +39,8 @@ module DevMetrics
             data_table(%w[Metric Value]) do
               [
                 table_row(['Total Deployments', format_number(frequency[:total_deployments].to_i)]),
-                table_row(['Deployments Per Week', format('%.2f', frequency[:deployments_per_week].to_f)]),
-                table_row(['Avg Days Between', format('%.1f', frequency[:avg_days_between_deployments].to_f)]),
+                table_row(['Deployments Per Week', format_float_plain(frequency[:deployments_per_week].to_f)]),
+                table_row(['Avg Days Between', format_percentage_plain(frequency[:avg_days_between_deployments].to_f)]),
                 table_row(['Days Since Last', format_number(frequency[:days_since_last_deployment].to_i)]),
                 table_row(['Frequency Category', safe_string(frequency[:frequency_category].to_s)]),
                 table_row(['Period Days', format_number(frequency[:period_days].to_i)]),
@@ -83,7 +83,7 @@ module DevMetrics
               patterns.map do |key, value|
                 case value
                 when Numeric
-                  table_row([format_label(key), format('%.2f', value)])
+                  table_row([format_label(key), format_float_plain(value)])
                 when Array
                   table_row([format_label(key), format_number(value.length)])
                 when Hash
@@ -121,7 +121,7 @@ module DevMetrics
                         end
 
           "<div style=\"background: #f9f9f9; padding: 10px; border-radius: 4px; margin: 10px 0;\">
-            <strong>Consistency Score:</strong> <span class=\"risk-#{score_class}\">#{format('%.2f',
+            <strong>Consistency Score:</strong> <span class=\"risk-#{score_class}\">#{format_float_plain(
                                                                                              consistency[:consistency_score].to_f)}</span>
           </div>"
         end
@@ -131,7 +131,7 @@ module DevMetrics
 
           automation = patterns[:automation]
           "<div style=\"background: #f9f9f9; padding: 10px; border-radius: 4px; margin: 10px 0;\">
-            <strong>Automated Deployments:</strong> #{format('%.1f', automation[:automated_percentage].to_f)}%
+            <strong>Automated Deployments:</strong> #{format_percentage_plain(automation[:automated_percentage].to_f)}%
           </div>"
         end
 
@@ -144,7 +144,7 @@ module DevMetrics
             data_table(%w[Metric Value]) do
               stability.map do |key, value|
                 if value.is_a?(Numeric)
-                  table_row([format_label(key), format('%.2f', value)])
+                  table_row([format_label(key), format_float_plain(value)])
                 else
                   table_row([format_label(key), safe_string(value.to_s)])
                 end
@@ -164,7 +164,7 @@ module DevMetrics
               trends.map do |key, value|
                 case value
                 when Numeric
-                  table_row([format_label(key), format('%.2f', value)])
+                  table_row([format_label(key), format_float_plain(value)])
                 when Array
                   table_row([format_label(key), format_number(value.length)])
                 when Hash
@@ -188,9 +188,9 @@ module DevMetrics
               quality.map do |key, value|
                 if value.is_a?(Numeric)
                   formatted_value = if key.to_s.include?('percentage') || key.to_s.include?('ratio')
-                                      "#{format('%.1f', value.to_f * 100)}%"
+                                      "#{format_percentage_plain(value.to_f * 100)}%"
                                     else
-                                      format('%.2f', value)
+                                      format_float_plain(value)
                                     end
                   table_row([format_label(key), formatted_value])
                 else

@@ -46,8 +46,6 @@ module DevMetrics
           ]
           table_row(cells)
         end
-
-
       end
     end
   end

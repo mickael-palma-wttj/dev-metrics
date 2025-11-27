@@ -41,12 +41,10 @@ module DevMetrics
             format_number(stats[:total_changes]),
             format_number(stats[:commits]),
             format_float(stats[:avg_changes_per_commit]),
-            "#{format_float(stats[:churn_ratio])}%",
+            format_percentage(stats[:churn_ratio]),
           ]
           table_row(cells)
         end
-
-
       end
     end
   end

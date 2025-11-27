@@ -112,6 +112,18 @@ module DevMetrics
           "<span class=\"percentage\">#{format("%.#{decimals}f", value)}%</span>"
         end
 
+        def format_percentage_plain(value, decimals = 1)
+          return '' if value.nil?
+
+          format("%.#{decimals}f", value)
+        end
+
+        def format_float_plain(value, decimals = 2)
+          return '' if value.nil?
+
+          format("%.#{decimals}f", value)
+        end
+
         def number_with_delimiter(num)
           num.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\\1,')
         end

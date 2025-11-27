@@ -41,15 +41,13 @@ module DevMetrics
           cells = [
             safe_filename,
             primary_owner,
-            "#{format('%.1f', owner_percentage)}%",
+            "#{format_percentage_plain(owner_percentage)}%",
             format_number(contributor_count),
-            "#{format('%.1f', concentration)}%",
+            "#{format_percentage_plain(concentration)}%",
             ownership_type,
           ]
           table_row(cells)
         end
-
-
       end
     end
   end

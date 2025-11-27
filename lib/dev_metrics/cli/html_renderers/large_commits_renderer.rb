@@ -37,11 +37,9 @@ module DevMetrics
               [
                 table_row(['Total Commits', format_number(overall[:total_commits].to_i)]),
                 table_row(['Large Commits',
-                           "#{format_number(overall[:large_commits].to_i)} (#{format('%.1f',
-                                                                                     overall[:large_commit_ratio].to_f)}%)",]),
+                           "#{format_number(overall[:large_commits].to_i)} (#{format_percentage_plain(overall[:large_commit_ratio].to_f)}%)",]),
                 table_row(['Huge Commits',
-                           "#{format_number(overall[:huge_commits].to_i)} (#{format('%.1f',
-                                                                                    overall[:huge_commit_ratio].to_f)}%)",]),
+                           "#{format_number(overall[:huge_commits].to_i)} (#{format_percentage_plain(overall[:huge_commit_ratio].to_f)}%)",]),
                 table_row(['Risk Score', risk_score_html(overall[:risk_score].to_f)]),
               ].join
             end
@@ -96,7 +94,7 @@ module DevMetrics
                   safe_string(author),
                   format_number(stats[:total_commits].to_i),
                   format_number(stats[:large_commits].to_i),
-                  format('%.1f', stats[:large_commit_ratio].to_f),
+                  format_percentage_plain(stats[:large_commit_ratio].to_f),
                   format_number(stats[:huge_commits].to_i),
                   format_number(stats[:avg_size].to_i),
                 ]
@@ -118,7 +116,7 @@ module DevMetrics
                   safe_string(file),
                   format_number(stats[:large_commits].to_i),
                   format_number(stats[:total_commits].to_i),
-                  format('%.1f', stats[:large_commit_ratio].to_f),
+                  format_percentage_plain(stats[:large_commit_ratio].to_f),
                   format_number(stats[:max_size].to_i),
                 ]
                 table_row(cells)
@@ -133,7 +131,7 @@ module DevMetrics
                       when 21..50 then 'medium'
                       else 'high'
                       end
-          "<span class=\"risk-#{css_class}\">#{format('%.1f', score)}</span>"
+          "<span class=\"risk-#{css_class}\">#{format_percentage_plain(score, 1)}</span>"
         end
 
         def format_label(key)

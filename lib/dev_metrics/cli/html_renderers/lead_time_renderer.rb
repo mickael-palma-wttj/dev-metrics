@@ -37,12 +37,12 @@ module DevMetrics
               [
                 table_row(['Total Commits', format_number(overall[:total_commits])]),
                 table_row(['Commits with Lead Time', format_number(overall[:commits_with_lead_time])]),
-                table_row(['Avg Lead Time Hours', format('%.2f', overall[:avg_lead_time_hours].to_f)]),
-                table_row(['Median Lead Time Hours', format('%.2f', overall[:median_lead_time_hours].to_f)]),
-                table_row(['P95 Lead Time Hours', format('%.2f', overall[:p95_lead_time_hours].to_f)]),
-                table_row(['Min Lead Time Hours', format('%.2f', overall[:min_lead_time_hours].to_f)]),
-                table_row(['Max Lead Time Hours', format('%.2f', overall[:max_lead_time_hours].to_f)]),
-                table_row(['Flow Efficiency', "#{format('%.1f', overall[:flow_efficiency].to_f * 100)}%"]),
+                table_row(['Avg Lead Time Hours', format_float_plain(overall[:avg_lead_time_hours].to_f)]),
+                table_row(['Median Lead Time Hours', format_float_plain(overall[:median_lead_time_hours].to_f)]),
+                table_row(['P95 Lead Time Hours', format_float_plain(overall[:p95_lead_time_hours].to_f)]),
+                table_row(['Min Lead Time Hours', format_float_plain(overall[:min_lead_time_hours].to_f)]),
+                table_row(['Max Lead Time Hours', format_float_plain(overall[:max_lead_time_hours].to_f)]),
+                table_row(['Flow Efficiency', "#{format_percentage_plain(overall[:flow_efficiency].to_f * 100)}%"]),
               ].join
             end
           end
@@ -71,10 +71,10 @@ module DevMetrics
           cells = [
             author_display,
             format_number(stats[:total_commits].to_i),
-            format('%.2f', stats[:avg_lead_time_hours].to_f),
-            format('%.2f', stats[:median_lead_time_hours].to_f),
-            format('%.2f', stats[:p95_lead_time_hours].to_f),
-            "#{format('%.1f', stats[:flow_efficiency].to_f * 100)}%",
+            format_float_plain(stats[:avg_lead_time_hours].to_f),
+            format_float_plain(stats[:median_lead_time_hours].to_f),
+            format_float_plain(stats[:p95_lead_time_hours].to_f),
+            "#{format_percentage_plain(stats[:flow_efficiency].to_f * 100)}%",
           ]
           table_row(cells)
         end
@@ -113,7 +113,7 @@ module DevMetrics
                   formatted_value = value.empty? ? '0' : render_bottleneck_hash(value)
                   table_row([format_label(key), formatted_value])
                 when Numeric
-                  table_row([format_label(key), format('%.2f', value)])
+                  table_row([format_label(key), format_float_plain(value)])
                 else
                   table_row([format_label(key), safe_string(value)])
                 end
@@ -152,7 +152,7 @@ module DevMetrics
                   formatted_value = value.empty? ? '0' : format_number(value.size)
                   table_row([format_label(key), formatted_value])
                 when Numeric
-                  table_row([format_label(key), format('%.2f', value)])
+                  table_row([format_label(key), format_float_plain(value)])
                 else
                   table_row([format_label(key), safe_string(value)])
                 end

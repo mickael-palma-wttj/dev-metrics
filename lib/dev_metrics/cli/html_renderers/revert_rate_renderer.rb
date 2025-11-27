@@ -36,7 +36,7 @@ module DevMetrics
                 table_row(['Total Commits', format_number(overall[:total_commits].to_i)]),
                 table_row(['Revert Commits', format_number(overall[:revert_commits].to_i)]),
                 table_row(['Reverted Commits', format_number(overall[:reverted_commits].to_i)]),
-                table_row(['Revert Rate', "#{format('%.2f', overall[:revert_rate].to_f)}%"]),
+                table_row(['Revert Rate', "#{format_percentage_plain(overall[:revert_rate].to_f)}%"]),
                 table_row(['Stability Score', stability_score_html(overall[:stability_score].to_f)]),
               ].join
             end
@@ -57,7 +57,7 @@ module DevMetrics
                   format_number(stats[:total_commits].to_i),
                   format_number(stats[:reverts_made].to_i),
                   format_number(stats[:commits_reverted].to_i),
-                  "#{format('%.2f', stats[:revert_rate].to_f)}%",
+                  "#{format_percentage_plain(stats[:revert_rate].to_f)}%",
                   reliability_score_html(stats[:reliability_score].to_f),
                 ]
                 table_row(cells)
@@ -171,8 +171,6 @@ module DevMetrics
                       end
           "<span class=\"risk-#{css_class}\">#{format('%.1f', score)}</span>"
         end
-
-
       end
     end
   end

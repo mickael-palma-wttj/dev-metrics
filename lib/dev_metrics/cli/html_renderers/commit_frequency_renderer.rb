@@ -189,8 +189,6 @@ module DevMetrics
             end
           end
         end
-
-
       end
     end
   end

@@ -45,14 +45,12 @@ module DevMetrics
             format_number(file1_changes),
             format_number(file2_changes),
             format_number(co_changes),
-            format('%.2f', coupling_strength),
-            "#{format('%.1f', coupling_percentage)}%",
+            format_float_plain(coupling_strength),
+            "#{format_percentage_plain(coupling_percentage)}%",
             coupling_category,
           ]
           table_row(cells)
         end
-
-
       end
     end
   end
