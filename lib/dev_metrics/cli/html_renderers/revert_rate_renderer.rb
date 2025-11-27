@@ -160,7 +160,7 @@ module DevMetrics
                       when 21..50 then 'medium'
                       else 'low'
                       end
-          "<span class=\"risk-#{css_class}\">#{format('%.1f', score)}</span>"
+          "<span class=\"risk-#{css_class}\">#{format_float_plain(score, 1)}</span>"
         end
 
         def reliability_score_html(score)
@@ -169,7 +169,7 @@ module DevMetrics
                       when 21..50 then 'medium'
                       else 'low'
                       end
-          "<span class=\"risk-#{css_class}\">#{format('%.1f', score)}</span>"
+          "<span class=\"risk-#{css_class}\">#{format_float_plain(score, 1)}</span>"
         end
       end
     end
