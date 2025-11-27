@@ -156,6 +156,10 @@ module DevMetrics
             end.join
           end
         end
+
+        def format_label(key)
+          key.to_s.gsub('_', ' ').split.map(&:capitalize).join(' ')
+        end
       end
     end
   end

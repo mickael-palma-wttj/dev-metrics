@@ -161,9 +161,9 @@ module DevMetrics
           section('Work Pattern', tooltip) do
             data_table(%w[Category Percentage Count]) do
               [
-                table_row(['Working Hours', "#{format('%.1f', working_hours[:working_hours_percentage].to_f)}%",
+                table_row(['Working Hours', format_percentage_plain(working_hours[:working_hours_percentage].to_f),
                            format_number(working_hours[:working_hours].to_i),]),
-                table_row(['Off Hours', "#{format('%.1f', working_hours[:off_hours_percentage].to_f)}%",
+                table_row(['Off Hours', format_percentage_plain(working_hours[:off_hours_percentage].to_f),
                            format_number(working_hours[:off_hours].to_i),]),
               ].join
             end
