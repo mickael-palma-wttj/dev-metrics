@@ -50,7 +50,7 @@ module DevMetrics
         def render_by_author
           return unless @value[:by_author]&.any?
 
-          tooltip = Services::MetricDescriptions.get_section_description('Bugfix Distribution')
+          tooltip = Services::MetricDescriptions.get_section_description('Bugfix Ratio by Author')
           section('Bugfix Ratio by Author', tooltip) do
             headers = ['Author', 'Total Commits', 'Bugfix Commits', 'Bugfix Ratio %', 'Quality Score']
             data_table(headers) do
@@ -71,7 +71,7 @@ module DevMetrics
         def render_by_file
           return unless @value[:by_file]&.any?
 
-          tooltip = Services::MetricDescriptions.get_section_description('Distribution by Author')
+          tooltip = Services::MetricDescriptions.get_section_description('Bugfix Distribution by File')
           section('Bugfix Distribution by File', tooltip) do
             headers = ['File', 'Bugfix Commits', 'Total Commits', 'Bugfix Ratio %']
             data_table(headers) do

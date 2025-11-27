@@ -75,21 +75,21 @@ module DevMetrics
 
       def count_total_commits(stats)
         commits_data.each do |commit|
-          author = commit[:author]
+          author = commit[:author_name]
           stats[author][:total_commits] += 1
         end
       end
 
       def count_reverts_made(stats)
         revert_commits.each do |commit|
-          author = commit[:author]
+          author = commit[:author_name]
           stats[author][:reverts_made] += 1
         end
       end
 
       def count_commits_reverted(stats)
         reverted_commits.each do |commit|
-          author = commit[:author]
+          author = commit[:author_name]
           stats[author][:commits_reverted] += 1
         end
       end

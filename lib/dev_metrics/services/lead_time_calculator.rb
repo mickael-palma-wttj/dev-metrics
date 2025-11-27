@@ -29,7 +29,7 @@ module DevMetrics
 
         ValueObjects::CommitLeadTime.new(
           hash: commit[:hash],
-          author: commit[:author],
+          author: commit[:author_name],
           message: commit[:message] || commit[:subject] || '',
           date: commit[:date],
           lead_time_hours: lead_time_hours,

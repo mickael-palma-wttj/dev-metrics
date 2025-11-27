@@ -19,7 +19,10 @@ module DevMetrics
 
         template_content = File.read(template_path, encoding: 'UTF-8')
         erb = ERB.new(template_content, trim_mode: '-')
-        erb.result(binding_context)
+        result = erb.result(binding_context)
+
+        # Ensure the result is UTF-8 encoded
+        ensure_utf8_encoding(result)
       end
 
       def template_exists?(template_name)
@@ -31,6 +34,16 @@ module DevMetrics
         Dir.glob(File.join(templates_dir, '*.erb')).map do |path|
           File.basename(path, '.erb')
         end
+      end
+
+      private
+
+      def ensure_utf8_encoding(str)
+        return str if str.encoding == Encoding::UTF_8 && str.valid_encoding?
+
+        str.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
+      rescue Encoding::UndefinedConversionError, Encoding::InvalidByteSequenceError
+        str.force_encoding('UTF-8').scrub('?')
       end
     end
   end

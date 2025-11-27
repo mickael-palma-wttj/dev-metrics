@@ -35,10 +35,10 @@ module DevMetrics
       end
 
       def count_commits_by_author(stats)
-        commits_data.each { |commit| stats[commit[:author]][:total_commits] += 1 }
+        commits_data.each { |commit| stats[commit[:author_name]][:total_commits] += 1 }
 
         categorized_commits.each do |category, commits|
-          commits.each { |commit| increment_category_count(stats, commit[:author], category) }
+          commits.each { |commit| increment_category_count(stats, commit[:author_name], category) }
         end
       end
 

@@ -10,11 +10,11 @@ module DevMetrics
             base: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 40px; color: #333; line-height: 1.6; }',
             heading: 'h1 { color: #1a1a1a; border-bottom: 3px solid #0066cc; padding-bottom: 15px; font-size: 28px; }',
             subheading: 'h2 { color: #404040; margin-top: 30px; font-size: 22px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }',
-            section_heading: 'h5 { color: #555; margin-top: 20px; margin-bottom: 12px; font-size: 16px; font-weight: 600; }',
+            section_heading: 'h5 { color: #555; margin-top: 20px; margin-bottom: 12px; font-size: 16px; font-weight: 600; position: relative; overflow: visible; }',
             metric: '.metric { margin: 20px 0; padding: 15px; background: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 8px; }',
             metric_header: '.metric-header { background: #f0f0f0; padding: 12px; border-bottom: 2px solid #ddd; border-radius: 6px 6px 0 0; }',
             metric_name: '.metric-name { font-size: 18px; font-weight: 700; color: #0066cc; }',
-            metric_body: '.metric-body { padding: 15px; background: white; border-radius: 0 0 6px 6px; }',
+            metric_body: '.metric-body { padding: 15px; background: white; border-radius: 0 0 6px 6px; overflow: visible; position: relative; z-index: 1; }',
             success: '.success { color: #4CAF50; font-weight: 600; }',
             error: '.error { color: #f44336; font-weight: 600; }',
             metadata: '.metadata { background: #e3f2fd; padding: 15px; margin-bottom: 20px; border-left: 4px solid #0066cc; border-radius: 4px; }',
@@ -89,12 +89,12 @@ module DevMetrics
             stat_value: '.stat-value { color: #0066cc; font-weight: 600; }',
 
             # Nested data
-            nested_data: '.nested-data { background: #f9f9f9; padding: 15px; border-radius: 4px; margin-bottom: 15px; }',
+            nested_data: '.nested-data { background: #f9f9f9; padding: 15px; border-radius: 4px; margin-bottom: 15px; overflow: visible; }',
 
             # Tooltips
-            tooltip: '.tooltip { position: relative; display: inline-block; cursor: help; border-bottom: 1px dotted #0066cc; }',
-            tooltip_text: '.tooltip .tooltip-text { visibility: hidden; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 10px 12px; position: absolute; z-index: 1000; bottom: 125%; left: 50%; margin-left: -75px; opacity: 0; transition: opacity 0.3s; width: 150px; font-size: 12px; font-weight: normal; box-shadow: 0 2px 8px rgba(0,0,0,0.2); line-height: 1.4; }',
-            tooltip_arrow: '.tooltip .tooltip-text::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #333 transparent transparent transparent; }',
+            tooltip: '.tooltip { position: relative; display: inline-block; cursor: help; border-bottom: 1px dotted #0066cc; z-index: 9998; }',
+            tooltip_text: '.tooltip .tooltip-text { visibility: hidden; background-color: #333; color: #fff; text-align: left; border-radius: 6px; padding: 12px 15px; position: absolute; z-index: 9999; top: 50%; left: 105%; margin-top: -50px; margin-left: 10px; opacity: 0; transition: opacity 0.3s; width: 280px; max-height: 200px; overflow-y: auto; font-size: 12px; font-weight: normal; box-shadow: 0 2px 8px rgba(0,0,0,0.2); line-height: 1.5; white-space: normal; word-wrap: break-word; }',
+            tooltip_arrow: '.tooltip .tooltip-text::after { content: ""; position: absolute; left: -10px; top: 50%; margin-top: -5px; border-width: 5px; border-style: solid; border-color: transparent #333 transparent transparent; }',
             tooltip_show: '.tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }',
           }.freeze
 

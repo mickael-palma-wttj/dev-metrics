@@ -51,7 +51,7 @@ module DevMetrics
         def render_thresholds
           return unless @value[:thresholds]
 
-          tooltip = Services::MetricDescriptions.get_section_description('Distribution by Author')
+          tooltip = Services::MetricDescriptions.get_section_description('Size Thresholds')
           section('Size Thresholds', tooltip) do
             data_table(['Size Category', 'Threshold (lines)']) do
               @value[:thresholds].map do |size, threshold|
@@ -67,7 +67,7 @@ module DevMetrics
         def render_largest_commits_table
           return unless @value[:largest_commits]&.any?
 
-          tooltip = Services::MetricDescriptions.get_section_description('Recent Reverts')
+          tooltip = Services::MetricDescriptions.get_section_description('Largest Commits')
           section('Largest Commits', tooltip) do
             headers = ['Date', 'Author', 'Size (lines)', 'File Count', 'Message']
             data_table(headers) do
@@ -109,7 +109,7 @@ module DevMetrics
         def render_by_file
           return unless @value[:by_file]&.any?
 
-          tooltip = Services::MetricDescriptions.get_section_description('Distribution by Author')
+          tooltip = Services::MetricDescriptions.get_section_description('Files with Large Commits')
           section('Files with Large Commits', tooltip) do
             headers = ['File', 'Large Commits', 'Total Commits', 'Large %', 'Max Size']
             data_table(headers) do

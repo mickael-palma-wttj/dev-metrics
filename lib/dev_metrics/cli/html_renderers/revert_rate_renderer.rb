@@ -81,7 +81,7 @@ module DevMetrics
                 details[:recent_reverts].first(10).map do |commit|
                   cells = [
                     safe_string(commit[:date].to_s.split.first),
-                    safe_string(commit[:author].to_s),
+                    safe_string(commit[:author_name].to_s),
                     safe_string(commit[:message].to_s[0..50]),
                     safe_string(commit[:reverted_commit_hash].to_s[0..8]),
                   ]

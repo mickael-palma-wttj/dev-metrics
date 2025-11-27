@@ -69,14 +69,29 @@ module DevMetrics
         end
 
         def with_tooltip(text, tooltip_text)
-          escaped_tooltip = tooltip_text.gsub('"', '&quot;').gsub("'", '&#39;')
-          "<span class=\"tooltip\">#{text}<span class=\"tooltip-text\">#{escaped_tooltip}</span></span>"
+          # Ensure both strings are UTF-8 encoded
+          text_safe = ensure_utf8(text)
+          tooltip_safe = ensure_utf8(tooltip_text)
+          escaped_tooltip = tooltip_safe.gsub('"', '&quot;').gsub("'", '&#39;')
+          "<span class=\"tooltip\">#{text_safe}<span class=\"tooltip-text\">#{escaped_tooltip}</span></span>"
+        end
+
+        def ensure_utf8(str)
+          return '' if str.nil?
+
+          str = str.to_s
+          return str if str.encoding == Encoding::UTF_8 && str.valid_encoding?
+
+          str.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
+        rescue Encoding::UndefinedConversionError, Encoding::InvalidByteSequenceError
+          str.force_encoding('UTF-8').scrub('?')
         end
 
         def safe_string(value)
           return '' if value.nil?
 
-          value.to_s.gsub('<', '&lt;').gsub('>', '&gt;').gsub('"', '&quot;')
+          str = ensure_utf8(value)
+          str.gsub('<', '&lt;').gsub('>', '&gt;').gsub('"', '&quot;')
         end
 
         def format_number(value, decimals = 2)

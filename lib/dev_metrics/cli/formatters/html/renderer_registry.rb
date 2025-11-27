@@ -31,7 +31,10 @@ module DevMetrics
             return no_data_message unless value
 
             renderer_class = renderer_for(metric_name)
-            renderer_class.new(value).render
+            result = renderer_class.new(value).render
+
+            # Ensure the result is UTF-8 encoded to prevent encoding issues in templates
+            ensure_utf8(result)
           end
 
           private_class_method def self.constantize_renderer(class_name)
@@ -40,6 +43,14 @@ module DevMetrics
 
           private_class_method def self.no_data_message
             '<div class="metric-detail">No data available</div>'
+          end
+
+          private_class_method def self.ensure_utf8(str)
+            return str if str.encoding == Encoding::UTF_8 && str.valid_encoding?
+
+            str.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
+          rescue Encoding::UndefinedConversionError, Encoding::InvalidByteSequenceError
+            str.force_encoding('UTF-8').scrub('?')
           end
         end
       end

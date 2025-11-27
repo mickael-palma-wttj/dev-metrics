@@ -577,40 +577,45 @@
             display: inline-block;
             cursor: help;
             border-bottom: 1px dotted #0066cc;
+            z-index: 9998;
         }
 
         .tooltip .tooltip-text {
             visibility: hidden;
             background-color: #333;
             color: #fff;
-            text-align: center;
+            text-align: left;
             border-radius: 6px;
-            padding: 10px 12px;
+            padding: 12px 15px;
             position: absolute;
-            z-index: 1001;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -75px;
+            z-index: 9999;
+            top: 50%;
+            left: 105%;
+            margin-top: -50px;
+            margin-left: 10px;
             opacity: 0;
             transition: opacity 0.3s;
-            width: 150px;
+            width: 280px;
+            max-height: 200px;
+            overflow-y: auto;
             font-size: 12px;
             font-weight: normal;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            line-height: 1.4;
+            line-height: 1.5;
             white-space: normal;
+            word-wrap: break-word;
             pointer-events: none;
         }
 
         .tooltip .tooltip-text::after {
             content: "";
             position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
+            left: -10px;
+            top: 50%;
+            margin-top: -5px;
             border-width: 5px;
             border-style: solid;
-            border-color: #333 transparent transparent transparent;
+            border-color: transparent #333 transparent transparent;
         }
 
         .tooltip:hover .tooltip-text {

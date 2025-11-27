@@ -134,7 +134,7 @@ module DevMetrics
         commit_sizes.sort_by { |c| -c[:size] }.first(10).map do |commit|
           {
             calculated_size: commit[:size],
-            author_name: commit[:author],
+            author_name: commit[:author_name],
             hash: commit[:hash][0..7],
             subject: commit[:message]&.slice(0, 100),
             date: commit[:date],

@@ -30,7 +30,7 @@ module DevMetrics
         def render_overall_metrics
           return unless @value[:overall]&.any?
 
-          tooltip = Services::MetricDescriptions.get_section_description('Deployment Timeline')
+          tooltip = Services::MetricDescriptions.get_section_description('Overall Metrics')
           section('Overall Metrics', tooltip) do
             overall = @value[:overall]
             data_table(%w[Metric Value]) do

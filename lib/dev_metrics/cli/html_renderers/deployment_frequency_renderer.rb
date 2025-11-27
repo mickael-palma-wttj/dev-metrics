@@ -34,7 +34,7 @@ module DevMetrics
           return unless frequency
           return unless frequency.is_a?(Hash) && frequency.any?
 
-          tooltip = Services::MetricDescriptions.get_section_description('Deployment Timeline')
+          tooltip = Services::MetricDescriptions.get_section_description('Deployment Metrics')
           section('Deployment Metrics', tooltip) do
             data_table(%w[Metric Value]) do
               [
@@ -181,7 +181,7 @@ module DevMetrics
           return unless @value[:quality_metrics]
 
           quality = @value[:quality_metrics]
-          tooltip = Services::MetricDescriptions.get_section_description('Deployment Stability')
+          tooltip = Services::MetricDescriptions.get_section_description('Quality Metrics')
           section('Quality Metrics', tooltip) do
             headers = %w[Metric Value]
             data_table(headers) do
