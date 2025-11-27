@@ -172,25 +172,7 @@ module DevMetrics
           "<span class=\"risk-#{css_class}\">#{format('%.1f', score)}</span>"
         end
 
-        def format_number(value)
-          return '' if value.nil?
 
-          "<span class=\"count\">#{number_with_delimiter(value.to_i)}</span>"
-        end
-
-        def number_with_delimiter(num)
-          num.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\\1,')
-        end
-
-        def render_simple_data
-          metric_detail('Value', Utils::ValueFormatter.format_generic_value(@value))
-        end
-
-        def safe_string(value)
-          return '' if value.nil?
-
-          value.to_s.gsub('<', '&lt;').gsub('>', '&gt;').gsub('"', '&quot;')
-        end
       end
     end
   end

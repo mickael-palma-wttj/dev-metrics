@@ -204,31 +204,6 @@ module DevMetrics
         def format_label(key)
           key.to_s.gsub('_', ' ').split.map(&:capitalize).join(' ')
         end
-
-        def format_number(value)
-          return '' if value.nil?
-
-          "<span class=\"count\">#{number_with_delimiter(value.to_i)}</span>"
-        end
-
-        def number_with_delimiter(num)
-          num.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\\1,')
-        end
-
-        def render_simple_data
-          metric_detail('Value', Utils::ValueFormatter.format_generic_value(@value))
-        end
-
-        def safe_string(value)
-          str = value.to_s
-          return str if str.encoding == Encoding::UTF_8 && str.valid_encoding?
-
-          begin
-            str.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
-          rescue Encoding::UndefinedConversionError, Encoding::InvalidByteSequenceError
-            value.to_s.force_encoding('UTF-8').scrub('?')
-          end
-        end
       end
     end
   end

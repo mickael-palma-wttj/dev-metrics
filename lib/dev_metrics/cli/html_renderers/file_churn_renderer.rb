@@ -47,47 +47,7 @@ module DevMetrics
           table_row(cells)
         end
 
-        def format_number(value)
-          return '' if value.nil?
 
-          "<span class=\"count\">#{number_with_delimiter(value.to_i)}</span>"
-        end
-
-        def format_float(value)
-          return '' if value.nil?
-
-          "<span class=\"percentage\">#{format('%.2f', value)}</span>"
-        end
-
-        def number_with_delimiter(num)
-          num.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\\1,')
-        end
-
-        def safe_value_format(value)
-          case value
-          when Numeric
-            value.is_a?(Float) ? format('%.2f', value) : value.to_s
-          when Hash
-            "#{value.keys.length} items"
-          when Array
-            "#{value.length} items"
-          else
-            value.to_s
-          end
-        end
-
-        def render_simple_data
-          metric_detail('Value', Utils::ValueFormatter.format_generic_value(@value))
-        end
-
-        def safe_string(value)
-          str = value.to_s
-          return str if str.encoding == Encoding::UTF_8 && str.valid_encoding?
-
-          str.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
-        rescue Encoding::UndefinedConversionError, Encoding::InvalidByteSequenceError
-          value.to_s.force_encoding('UTF-8').scrub('?')
-        end
       end
     end
   end

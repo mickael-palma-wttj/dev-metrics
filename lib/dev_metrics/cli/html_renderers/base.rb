@@ -94,11 +94,55 @@ module DevMetrics
           str.gsub('<', '&lt;').gsub('>', '&gt;').gsub('"', '&quot;')
         end
 
-        def format_number(value, decimals = 2)
-          return '0' if value.nil?
-          return value.to_s unless value.is_a?(Numeric)
+        def format_number(value)
+          return '' if value.nil?
 
-          format("%.#{decimals}f", value)
+          "<span class=\"count\">#{number_with_delimiter(value.to_i)}</span>"
+        end
+
+        def format_float(value)
+          return '' if value.nil?
+
+          "<span class=\"percentage\">#{format('%.2f', value)}</span>"
+        end
+
+        def format_percentage(value, decimals = 1)
+          return '' if value.nil?
+
+          "<span class=\"percentage\">#{format("%.#{decimals}f", value)}%</span>"
+        end
+
+        def number_with_delimiter(num)
+          num.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\\1,')
+        end
+
+        def safe_value_format(value)
+          case value
+          when Numeric
+            value.is_a?(Float) ? format('%.2f', value) : value.to_s
+          when Hash
+            "#{value.keys.length} items"
+          when Array
+            "#{value.length} items"
+          else
+            value.to_s
+          end
+        end
+
+        def render_simple_data
+          metric_detail('Value', Utils::ValueFormatter.format_generic_value(@value))
+        end
+
+        def render_keyed_hash_table(headers, renderer_method)
+          data_table(headers) do
+            @value.map do |key, value|
+              if value.is_a?(Hash)
+                renderer_method.call(key, value)
+              else
+                table_row([key, safe_value_format(value)])
+              end
+            end.join
+          end
         end
       end
     end
