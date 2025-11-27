@@ -18,16 +18,7 @@ module DevMetrics
 
         def render_authors_per_file_stats_table
           headers = ['Filename', 'Author Count', 'Authors', 'Bus Factor', 'Ownership Type']
-          data_table(headers) do
-            @value.map do |filename, stats|
-              if stats.is_a?(Hash)
-                render_file_author_stats_columns(filename, stats)
-              else
-                # Fallback for unexpected data format
-                table_row([filename, safe_value_format(stats)])
-              end
-            end.join
-          end
+          render_keyed_hash_table(headers, method(:render_file_author_stats_columns))
         end
 
         def render_file_author_stats_columns(filename, stats)

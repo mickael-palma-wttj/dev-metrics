@@ -19,16 +19,7 @@ module DevMetrics
         def render_author_change_stats_table
           headers = ['Author', 'Additions', 'Deletions', 'Net Changes', 'Total Changes', 'Commits',
                      'Avg Changes/Commit', 'Churn Ratio',]
-          data_table(headers) do
-            @value.map do |author_name, stats|
-              if stats.is_a?(Hash)
-                render_author_stats_columns(author_name, stats)
-              else
-                # Fallback for unexpected data format
-                table_row([author_name, safe_value_format(stats)])
-              end
-            end.join
-          end
+          render_keyed_hash_table(headers, method(:render_author_stats_columns))
         end
 
         def render_author_stats_columns(author_name, stats)

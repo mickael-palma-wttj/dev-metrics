@@ -19,16 +19,7 @@ module DevMetrics
         def render_file_churn_stats_table
           headers = ['Filename', 'Total Churn', 'Additions', 'Deletions', 'Net Changes', 'Commits', 'Authors Count',
                      'Avg Churn/Commit', 'Churn Ratio',]
-          data_table(headers) do
-            @value.map do |filename, stats|
-              if stats.is_a?(Hash)
-                render_file_stats_columns(filename, stats)
-              else
-                # Fallback for unexpected data format
-                table_row([filename, safe_value_format(stats)])
-              end
-            end.join
-          end
+          render_keyed_hash_table(headers, method(:render_file_stats_columns))
         end
 
         def render_file_stats_columns(filename, stats)

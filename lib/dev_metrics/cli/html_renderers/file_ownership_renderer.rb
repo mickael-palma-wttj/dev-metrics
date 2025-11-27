@@ -18,16 +18,7 @@ module DevMetrics
 
         def render_file_ownership_stats_table
           headers = ['Filename', 'Primary Owner', 'Owner %', 'Contributors', 'Concentration', 'Type']
-          data_table(headers) do
-            @value.map do |filename, stats|
-              if stats.is_a?(Hash)
-                render_file_ownership_columns(filename, stats)
-              else
-                # Fallback for unexpected data format
-                table_row([filename, safe_value_format(stats)])
-              end
-            end.join
-          end
+          render_keyed_hash_table(headers, method(:render_file_ownership_columns))
         end
 
         def render_file_ownership_columns(filename, stats)

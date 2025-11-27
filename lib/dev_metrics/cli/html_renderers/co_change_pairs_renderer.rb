@@ -19,16 +19,7 @@ module DevMetrics
         def render_co_change_pairs_table
           headers = ['File Pair', 'File 1 Changes', 'File 2 Changes', 'Co-changes', 'Coupling Strength', 'Coupling %',
                      'Category',]
-          data_table(headers) do
-            @value.map do |pair_key, stats|
-              if stats.is_a?(Hash)
-                render_co_change_pair_columns(pair_key, stats)
-              else
-                # Fallback for unexpected data format
-                table_row([pair_key, safe_value_format(stats)])
-              end
-            end.join
-          end
+          render_keyed_hash_table(headers, method(:render_co_change_pair_columns))
         end
 
         def render_co_change_pair_columns(pair_key, stats)

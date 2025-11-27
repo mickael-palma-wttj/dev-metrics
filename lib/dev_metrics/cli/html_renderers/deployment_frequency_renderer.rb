@@ -122,7 +122,8 @@ module DevMetrics
 
           "<div style=\"background: #f9f9f9; padding: 10px; border-radius: 4px; margin: 10px 0;\">
             <strong>Consistency Score:</strong> <span class=\"risk-#{score_class}\">#{format_float_plain(
-                                                                                             consistency[:consistency_score].to_f)}</span>
+              consistency[:consistency_score].to_f
+            )}</span>
           </div>"
         end
 
