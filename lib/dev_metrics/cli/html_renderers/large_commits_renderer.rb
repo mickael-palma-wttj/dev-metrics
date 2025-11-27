@@ -133,10 +133,6 @@ module DevMetrics
                       end
           "<span class=\"risk-#{css_class}\">#{format_percentage_plain(score, 1)}</span>"
         end
-
-        def format_label(key)
-          key.to_s.gsub('_', ' ').split.map(&:capitalize).join(' ')
-        end
       end
     end
   end
