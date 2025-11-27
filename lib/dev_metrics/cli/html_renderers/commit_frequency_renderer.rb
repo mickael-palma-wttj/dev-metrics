@@ -181,7 +181,7 @@ module DevMetrics
                 cells = [
                   safe_string(author),
                   format_number(stats[:total_commits].to_i),
-                  format('%.1f', stats[:avg_per_day].to_f),
+                  format_float_plain(stats[:avg_per_day].to_f, 1),
                   format_number(stats[:max_in_day].to_i),
                 ]
                 table_row(cells)

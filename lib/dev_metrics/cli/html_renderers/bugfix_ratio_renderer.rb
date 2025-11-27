@@ -39,7 +39,7 @@ module DevMetrics
                            "#{format_number(overall[:bugfix_commits])} (#{format_percentage_plain(overall[:bugfix_ratio].to_f)}%)",]),
                 table_row(['Feature Commits',
                            "#{format_number(overall[:feature_commits])} (#{format_percentage_plain(overall[:feature_ratio].to_f)}%)",]),
-                table_row(['Quality Score', format('%.2f', overall[:quality_score].to_f).to_s]),
+                table_row(['Quality Score', format_float_plain(overall[:quality_score].to_f)]),
               ].join
             end
           end
